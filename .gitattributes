@@ -1,0 +1,3 @@
+# Ignore documentation for language statistics
+docs/* linguist-documentation
+*.md linguist-documentation
