@@ -1,0 +1,75 @@
+{
+  "items": {
+    "A": {
+      "id": "A",
+      "name": "A",
+      "type": "Test",
+      "full_name": "A",
+      "hash": "7fc56270",
+      "definition": null,
+      "translation": null,
+      "is_class": false,
+      "properties": {
+        "Input": {
+          "name": "Input",
+          "value": "",
+          "attributes": {},
+          "item_links": [],
+          "extra_xml": null
+        },
+        "DisplayOrder": {
+          "name": "DisplayOrder",
+          "value": "0",
+          "attributes": {},
+          "item_links": [],
+          "extra_xml": null
+        }
+      },
+      "children": [],
+      "link_from": [],
+      "link_to": []
+    },
+    "B": {
+      "id": "B",
+      "name": "B",
+      "type": "Test",
+      "full_name": "B",
+      "hash": "9d5ed678",
+      "definition": null,
+      "translation": null,
+      "is_class": false,
+      "properties": {
+        "DisplayOrder": {
+          "name": "DisplayOrder",
+          "value": "0",
+          "attributes": {},
+          "item_links": [],
+          "extra_xml": null
+        }
+      },
+      "children": [],
+      "link_from": [],
+      "link_to": []
+    }
+  },
+  "classes": {},
+  "flow_graph": {
+    "A": [],
+    "B": []
+  },
+  "security": {
+    "users": {},
+    "scopes": {
+      "00000000-0000-0000-0000-000000000000": {
+        "id": "00000000-0000-0000-0000-000000000000",
+        "name": "{Global}",
+        "full_name": "{Global}"
+      }
+    }
+  },
+  "platform_version": "0.0",
+  "applications_version": "0.0",
+  "properties": {
+    "name": "TestProject"
+  }
+}

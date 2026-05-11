@@ -1,0 +1,9 @@
+<Project name="TestProject">
+  <Item id="A" name="A" type="Test">
+    <Property name="Input">
+      <ItemLink absolutePath="B" />
+    </Property>
+  </Item>
+
+  <Item id="B" name="B" type="Test" />
+</Project>
