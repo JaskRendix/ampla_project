@@ -1,11 +1,11 @@
 # Ampla Project Normalization Engine
 
-A Python-based normalization engine for Ampla project XML files.  
-This codebase replaces the legacy XSLT system found in the original ProjectAnalysis repository.
+A Python implementation of the Ampla project normalization pipeline.  
+This package replaces the normalization logic from the legacy XSLT‑based ProjectAnalysis tool.
 
-## Purpose
+## Overview
 
-The engine reads an Ampla project export and produces a structured representation of:
+The engine loads an Ampla project XML export and builds a structured model of:
 
 - **items**  
 - **classes**  
@@ -15,17 +15,20 @@ The engine reads an Ampla project export and produces a structured representatio
 - **expressions**  
 - **security**  
 
-The output can be serialized to JSON for downstream processing.
+The model can be serialized to JSON for downstream tools.
+
+The project focuses on the normalization layer only.  
+Legacy HTML, Excel, DotML, metrics, and inventory exports are not included.
 
 ## Features
 
-- Structured project model  
+- Clear project model  
 - Deterministic normalization pipeline  
 - LinkFrom and LinkTo graph construction  
 - Expression reference resolution  
 - Security model extraction  
 - JSON serialization  
-- Unit tests for all core modules  
+- Full test suite for core modules  
 
 ## Project Structure
 
@@ -34,8 +37,8 @@ ampla_project/
   model/          # Data classes
   normalize/      # Normalization pipeline
   outputs/        # JSON serialization
+docs/             # Developer documentation
 tests/            # Unit tests
-src/              # Legacy XSLT system (not used by Python engine)
 ```
 
 ## Installation
@@ -66,17 +69,20 @@ print(data)
 pytest -q
 ```
 
-## Legacy System Notes
+## Legacy Reference
 
-The `src` folder contains the original XSLT-based ProjectAnalysis tool.  
-The Python engine replaces only the normalization logic.  
-Legacy exports such as HTML, Excel, DotML, metrics, and inventory reports are not implemented.
+This project re‑implements the normalization logic from the original Ampla ProjectAnalysis tool:
 
-For detailed documentation, see:
+[https://github.com/Ampla/ProjectAnalysis](https://github.com/Ampla/ProjectAnalysis)
 
-- docs/legacy-xslt-architecture.md
-- docs/xslt-to-python-mapping.md
-- docs/migration-gaps.md
+The Python engine replaces the normalization layer only.  
+The legacy tool includes a full reporting system that is not part of this package.
+
+## Documentation
+
+- `docs/legacy-xslt-architecture.md` — structure of the original XSLT system  
+- `docs/xslt-to-python-mapping.md` — mapping between XSLT templates and Python modules  
+- `docs/migration-gaps.md` — features covered and features outside the project scope  
 
 ## License
 
