@@ -7,7 +7,9 @@ authors = [
 ]
 requires-python = ">=3.12"
 dependencies = [
-    "lxml"
+    "lxml",
+    "fastapi",
+    "uvicorn[standard]"
 ]
 
 [project.optional-dependencies]
