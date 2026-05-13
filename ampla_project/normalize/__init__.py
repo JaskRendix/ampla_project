@@ -9,6 +9,7 @@ from .expressions import normalize_expression_config
 from .flow import build_flow_graph
 from .items import normalize_items
 from .links import build_link_from_to, resolve_item_links
+from .metrics import calculate_metrics
 from .security import normalize_security
 
 
@@ -48,11 +49,14 @@ def normalize(root: Element, language_doc: Element | None = None) -> Project:
 
     security = normalize_security(ctx, items)
 
+    metrics = calculate_metrics(items, classes, security)
+
     return Project(
         items=items,
         classes=classes,
         flow_graph=flow_graph,
         security=security,
+        metrics=metrics,
         platform_version=_get_platform_version(root),
         applications_version=_get_applications_version(root),
         properties=_extract_project_properties(root),

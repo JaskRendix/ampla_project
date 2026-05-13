@@ -1,8 +1,23 @@
 from __future__ import annotations
 
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 
 from .item import Item
+
+
+@dataclass
+class ProjectMetrics:
+    """Calculated statistics for the project."""
+
+    item_counts: dict[str, int] = field(default_factory=dict)
+    total_links: int = 0
+    broken_links_count: int = 0
+    orphaned_items_count: int = 0
+    user_roles_count: int = 0
+    class_counts: dict[str, int] = field(default_factory=dict)
+    unused_classes_count: int = 0
+    class_inheritance_depth_max: int = 0
+    class_inheritance_cycles: int = 0
 
 
 @dataclass
@@ -36,7 +51,7 @@ class Project:
     applications_version: str
     properties: dict[str, str]  # raw project-level attributes
 
-    # Convenience helpers ----------------------------------------------------
+    metrics: ProjectMetrics = field(default_factory=ProjectMetrics)
 
     def get_item(self, item_id: str) -> Item | None:
         return self.items.get(item_id)
