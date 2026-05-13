@@ -30,6 +30,21 @@ Legacy HTML, Excel, DotML, metrics, and inventory exports are not included.
 - JSON serialization  
 - Full test suite for core modules  
 
+## Metrics
+
+The engine computes project‑level metrics after normalization, including:
+
+- item counts by type  
+- link totals and broken link counts  
+- orphaned items  
+- class counts  
+- unused classes  
+- class inheritance depth  
+- class inheritance cycles  
+- user role count  
+
+Metrics are stored in `ProjectMetrics` and included in the JSON output.
+
 ## Project Structure
 
 ```
