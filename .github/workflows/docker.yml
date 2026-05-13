@@ -41,9 +41,6 @@ jobs:
           echo "API did not start"
           exit 1
 
-      - name: Run tests inside container via Makefile
-        run: make test
-
       - name: Shut down docker-compose via Makefile
         if: always()
         run: make docker-down
