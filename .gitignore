@@ -15,6 +15,7 @@ dist/
 build/
 
 # Pytest cache
+.coverage
 .pytest_cache/
 
 # IDEs

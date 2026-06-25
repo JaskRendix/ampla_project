@@ -15,6 +15,7 @@ dependencies = [
 [project.optional-dependencies]
 test = [
     "pytest",
+    "pytest-cov",
     "httpx"
 ]
 
@@ -32,3 +33,4 @@ include = ["ampla_project*"]
 [tool.pytest.ini_options]
 pythonpath = ["."]
 testpaths = ["tests"]
+addopts = "--cov=ampla_project --cov-report=term-missing"
