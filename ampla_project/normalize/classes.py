@@ -53,14 +53,17 @@ def _build_class_item(ctx: NormalizationContext, elem: Element) -> Item:
     )
 
     # 1. Inheritance chain
-    ancestors = list(elem.iterancestors(tag="ClassDefinition"))
-    if len(ancestors) > 1:
+    ancestors = [
+        ancestor
+        for ancestor in elem.iterancestors(tag="ClassDefinition")
+        if ancestor.get("id")
+    ]
+    if ancestors:
         inherits_prop = Property(
             name="(inherits)", value=None, attributes={}, item_links=[]
         )
 
-        # Skip the first ancestor (self)
-        for ancestor in ancestors[1:]:
+        for ancestor in ancestors:
             link = ItemLink(
                 target_id=ancestor.get("id"),
                 absolute_path=_compute_class_full_name(ancestor),
@@ -70,15 +73,16 @@ def _build_class_item(ctx: NormalizationContext, elem: Element) -> Item:
 
         item.properties["(inherits)"] = inherits_prop
 
-    # 2. Inherited property definitions
-    for prop_def in elem.findall(".//PropertyDefinition"):
-        prop = Property(
-            name=prop_def.get("name"),
-            value=(prop_def.text or "").strip(),
-            attributes={k: v for k, v in prop_def.attrib.items()},
-            item_links=[],
-        )
-        item.properties[prop.name] = prop
+    # Apply inherited definitions from oldest ancestor to this class.
+    for definition_owner in [*reversed(ancestors), elem]:
+        for prop_def in definition_owner.findall("PropertyDefinition"):
+            prop = Property(
+                name=prop_def.get("name"),
+                value=(prop_def.text or "").strip(),
+                attributes={k: v for k, v in prop_def.attrib.items()},
+                item_links=[],
+            )
+            item.properties[prop.name] = prop
 
     # 3. Child class definitions (nested classes)
     for child in elem.findall("ClassDefinition"):
@@ -120,7 +124,7 @@ def resolve_class_association(
     Equivalent to XSLT logic that links Items to ClassDefinitions.
     """
 
-    # 1. Find class reference
+    # 1. Resolve the legacy Class property/element reference.
     class_prop = elem.find("Property[@name='Class']")
     class_elem = elem.find("Class")
 
@@ -130,27 +134,91 @@ def resolve_class_association(
     elif class_elem is not None and class_elem.text:
         class_name = class_elem.text.strip()
 
-    if not class_name:
-        return
+    if class_name:
+        class_id, full_name = _resolve_class_reference(ctx, class_name)
+        item.properties["Class"] = Property(
+            name="Class",
+            value=class_name,
+            attributes={},
+            item_links=[
+                ItemLink(
+                    target_id=class_id,
+                    absolute_path=full_name or class_name,
+                    property_name="Class",
+                    broken_target=class_id is None,
+                )
+            ],
+        )
 
-    # 2. Resolve class fullName → class ID
-    class_id = None
-    for cid, class_def in ctx.classes_by_id.items():
-        if class_name == class_def.get(
-            "name"
-        ) or class_name == _compute_class_full_name(class_def):
-            class_id = cid
-            break
+    # Project.Normalize.xslt emits ItemClassAssociation as a class property.
+    associations = elem.findall("ItemClassAssociation[@classDefinitionId]")
+    if associations:
+        links = []
+        for association in associations:
+            class_id = association.get("classDefinitionId")
+            links.append(
+                ItemLink(
+                    target_id=class_id,
+                    absolute_path=(
+                        get_class_full_name_by_id(ctx, class_id) if class_id else None
+                    ),
+                    property_name="ClassAssociation",
+                    broken_target=class_id not in ctx.classes_by_id,
+                )
+            )
+        item.properties["ClassAssociation"] = Property(
+            name="ClassAssociation",
+            value=None,
+            attributes={"class": "true"},
+            item_links=links,
+        )
 
-    # 3. Build ItemLink
-    link = ItemLink(
-        target_id=class_id,
-        absolute_path=class_name,
-        property_name="Class",
-        broken_target=(class_id is None),
-    )
+    # EquipmentTemplate targets are class references, not ordinary item links.
+    if item.type == "Citect.Ampla.General.Server.Templating.EquipmentTemplate":
+        target_elem = elem.find("Property[@name='TargetEquipmentClass']")
+        if target_elem is not None:
+            class_ref = target_elem.get("classDefinitionId") or (
+                target_elem.text.strip() if target_elem.text else ""
+            )
+            class_id, full_name = _resolve_class_reference(ctx, class_ref)
+            property_ = item.properties.get("TargetEquipmentClass")
+            if property_ is not None:
+                property_.attributes["class"] = "true"
+                property_.item_links.append(
+                    ItemLink(
+                        target_id=class_id,
+                        absolute_path=full_name or (class_ref or None),
+                        property_name="TargetEquipmentClass",
+                        broken_target=class_id is None,
+                    )
+                )
 
-    # 4. Add to item properties
-    item.properties["Class"] = Property(
-        name="Class", value=class_name, attributes={}, item_links=[link]
-    )
+
+def _resolve_class_reference(
+    ctx: NormalizationContext, class_ref: str
+) -> tuple[str | None, str | None]:
+    if not class_ref:
+        return None, None
+
+    class_elem = ctx.classes_by_id.get(class_ref)
+    if class_elem is not None:
+        return class_ref, _compute_class_full_name(class_elem)
+
+    exact_matches = [
+        (class_id, elem)
+        for class_id, elem in ctx.classes_by_id.items()
+        if class_ref == _compute_class_full_name(elem)
+    ]
+    if len(exact_matches) == 1:
+        class_id, elem = exact_matches[0]
+        return class_id, _compute_class_full_name(elem)
+
+    name_matches = [
+        (class_id, elem)
+        for class_id, elem in ctx.classes_by_id.items()
+        if class_ref == elem.get("name")
+    ]
+    if len(name_matches) == 1:
+        class_id, elem = name_matches[0]
+        return class_id, _compute_class_full_name(elem)
+    return None, None

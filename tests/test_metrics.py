@@ -1,5 +1,8 @@
+from lxml.etree import parse
+
 from ampla_project.model.item import Item, ItemLink, Property
 from ampla_project.model.security import Identity, SecurityUser
+from ampla_project.normalize import normalize
 from ampla_project.normalize.metrics import calculate_metrics
 
 
@@ -160,6 +163,44 @@ def test_inheritance_cycle_detection():
 
     assert m.class_inheritance_cycles == 1
     assert m.class_inheritance_depth_max == 0  # no valid depth
+
+
+def test_normalized_inheritance_depth_uses_nearest_parent_chain():
+    root = parse("tests/data/parity/class_inheritance.xml").getroot()
+    project = normalize(root)
+
+    assert project.metrics.class_inheritance_depth_max == 2
+    assert project.metrics.class_inheritance_cycles == 0
+
+
+def test_inheritance_depth_resolves_parent_by_id_and_full_name():
+    base = make_class("base", "Base")
+    derived = make_class("derived", "Derived")
+    derived.full_name = "Base.Derived"
+    leaf = make_class("leaf", "Leaf")
+    derived.properties["(inherits)"] = Property(
+        name="(inherits)",
+        value=None,
+        attributes={},
+        item_links=[ItemLink(target_id="base", absolute_path="Base")],
+    )
+    leaf.properties["(inherits)"] = Property(
+        name="(inherits)",
+        value=None,
+        attributes={},
+        item_links=[
+            ItemLink(target_id="missing", absolute_path="Base.Derived"),
+            ItemLink(target_id="base", absolute_path="Base"),
+        ],
+    )
+
+    metrics = calculate_metrics(
+        {},
+        {"base": base, "derived": derived, "leaf": leaf},
+        {"users": {}},
+    )
+
+    assert metrics.class_inheritance_depth_max == 2
 
 
 def test_user_roles_count():

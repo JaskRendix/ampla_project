@@ -1,0 +1,31 @@
+<Project>
+  <ClassDefinitions>
+    <ClassDefinition id="base" name="Base" type="Equipment">
+      <ClassDefinition id="derived" name="Derived" type="Equipment" />
+    </ClassDefinition>
+    <ClassDefinition id="plant-a" name="PlantA" type="Equipment">
+      <ClassDefinition id="drive-a" name="Drive" type="Equipment" />
+    </ClassDefinition>
+    <ClassDefinition id="plant-b" name="PlantB" type="Equipment">
+      <ClassDefinition id="drive-b" name="Drive" type="Equipment" />
+    </ClassDefinition>
+  </ClassDefinitions>
+  <Item id="associated" name="Associated" type="Variable">
+    <ItemClassAssociation classDefinitionId="derived" />
+  </Item>
+  <Item id="equipment" name="EquipmentTemplate" type="Citect.Ampla.General.Server.Templating.EquipmentTemplate">
+    <Property name="TargetEquipmentClass" classDefinitionId="derived">derived</Property>
+  </Item>
+  <Item id="named-class" name="NamedClass" type="Variable">
+    <Property name="Class">Base.Derived</Property>
+  </Item>
+  <Item id="element-class" name="ElementClass" type="Variable">
+    <Class>Base.Derived</Class>
+  </Item>
+  <Item id="ambiguous-class" name="AmbiguousClass" type="Variable">
+    <Property name="Class">Drive</Property>
+  </Item>
+  <Item id="qualified-class" name="QualifiedClass" type="Variable">
+    <Property name="Class">PlantB.Drive</Property>
+  </Item>
+</Project>

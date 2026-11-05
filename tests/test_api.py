@@ -127,3 +127,36 @@ def test_api_preserves_nested_property_links():
         None,
         "target",
     ]
+
+
+def test_classes_api_preserves_inheritance_and_associations():
+    path = str(Path("tests/data/parity/class_inheritance.xml").resolve())
+    response = client.get("/classes", params={"path": path})
+
+    assert response.status_code == 200
+    classes = response.json()
+    assert [
+        link["target_id"]
+        for link in classes["leaf"]["properties"]["(inherits)"]["item_links"]
+    ] == ["derived", "base"]
+    assert "LeafOnly" not in classes["derived"]["properties"]
+
+    association_path = str(Path("tests/data/parity/class_associations.xml").resolve())
+    item_response = client.get("/items/associated", params={"path": association_path})
+    assert item_response.status_code == 200
+    assert (
+        item_response.json()["properties"]["ClassAssociation"]["item_links"][0][
+            "absolute_path"
+        ]
+        == "Base.Derived"
+    )
+    equipment_response = client.get(
+        "/items/equipment", params={"path": association_path}
+    )
+    assert equipment_response.status_code == 200
+    assert (
+        equipment_response.json()["properties"]["TargetEquipmentClass"]["item_links"][
+            0
+        ]["target_id"]
+        == "derived"
+    )

@@ -1,0 +1,16 @@
+<Project>
+  <ClassDefinitions>
+    <ClassDefinition id="base" name="Base" type="Equipment">
+      <PropertyDefinition name="BaseOnly" type="System.String">base value</PropertyDefinition>
+      <ClassDefinition id="derived" name="Derived" type="Equipment">
+        <PropertyDefinition name="DerivedOnly" type="System.Int32">2</PropertyDefinition>
+        <ClassDefinition id="leaf" name="Leaf" type="Equipment">
+          <PropertyDefinition name="LeafOnly" type="System.Boolean">True</PropertyDefinition>
+        </ClassDefinition>
+        <ClassDefinition id="sibling" name="Sibling" type="Equipment">
+          <PropertyDefinition name="SiblingOnly">sibling value</PropertyDefinition>
+        </ClassDefinition>
+      </ClassDefinition>
+    </ClassDefinition>
+  </ClassDefinitions>
+</Project>

@@ -54,58 +54,72 @@ def calculate_metrics(
     )
 
     # 6. Inheritance depth + cycle detection
-    def get_parent_class_name(cls: Item) -> str | None:
-        prop = cls.properties.get("Parent")
-        return prop.value if prop else None
+    classes_by_full_name = {
+        cls.full_name: class_id for class_id, cls in classes.items()
+    }
+    classes_by_name: dict[str, list[str]] = {}
+    for class_id, cls in classes.items():
+        classes_by_name.setdefault(cls.name, []).append(class_id)
 
-    def inheritance_depth(
-        cls_id: str,
-        visited: set[str] | None = None,
-    ) -> tuple[int, set[str]]:
-        if visited is None:
-            visited = set()
+    def resolve_class_id(reference: str | None) -> str | None:
+        if not reference:
+            return None
+        if reference in classes:
+            return reference
+        if reference in classes_by_full_name:
+            return classes_by_full_name[reference]
+        matches = classes_by_name.get(reference, [])
+        return matches[0] if len(matches) == 1 else None
 
-        if cls_id in visited:
-            return -1, visited  # cycle
+    def get_parent_class_id(cls: Item) -> str | None:
+        inherits = cls.properties.get("(inherits)")
+        if inherits is not None:
+            for link in inherits.item_links:
+                parent_id = resolve_class_id(link.target_id)
+                if parent_id is None:
+                    parent_id = resolve_class_id(link.absolute_path)
+                if parent_id is not None:
+                    return parent_id
+            return None
 
-        visited.add(cls_id)
+        parent = cls.properties.get("Parent")
+        return resolve_class_id(parent.value if parent else None)
 
-        cls = classes.get(cls_id)
-        if cls is None:
-            return 0, visited
+    state: dict[str, int] = {}
+    depths: dict[str, int | None] = {}
+    path: list[str] = []
+    cycles_found: set[frozenset[str]] = set()
 
-        parent_name: str | None = get_parent_class_name(cls)
-        if not parent_name:
-            return 0, visited
+    def inheritance_depth(class_id: str) -> int | None:
+        if state.get(class_id) == 2:
+            return depths[class_id]
+        if state.get(class_id) == 1:
+            cycle_start = path.index(class_id)
+            cycles_found.add(frozenset(path[cycle_start:]))
+            return None
 
-        parent_cls_id: str | None = next(
-            (cid for cid, c in classes.items() if c.name == parent_name),
-            None,
-        )
-        if not parent_cls_id:
-            return 0, visited
-
-        depth, visited = inheritance_depth(parent_cls_id, visited)
-        if depth < 0:
-            return -1, visited
-
-        return depth + 1, visited
-
-    max_depth: int = 0
-    cycles: int = 0
-    cycle_seen: set[str] = set()
-
-    for cls_id in classes:
-        if cls_id in cycle_seen:
-            continue
-
-        depth, visited = inheritance_depth(cls_id)
-
-        if depth < 0:
-            cycles += 1
-            cycle_seen.update(visited)
+        state[class_id] = 1
+        path.append(class_id)
+        parent_id = get_parent_class_id(classes[class_id])
+        if parent_id is None:
+            depth = 0
         else:
-            max_depth = max(max_depth, depth)
+            parent_depth = inheritance_depth(parent_id)
+            depth = parent_depth + 1 if parent_depth is not None else None
+        path.pop()
+        state[class_id] = 2
+        depths[class_id] = depth
+        return depth
+
+    max_depth = max(
+        (
+            depth
+            for class_id in classes
+            if (depth := inheritance_depth(class_id)) is not None
+        ),
+        default=0,
+    )
+    cycles = len(cycles_found)
 
     metrics = ProjectMetrics(
         item_counts=item_counts,
