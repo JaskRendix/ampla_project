@@ -21,15 +21,13 @@ Legacy **reporting, HTML, Excel, DotML, and mindmap** templates are explicitly *
   property links → `ampla_project.normalize.expression_model`
 - Flow graph and source-compatible root/immediate-link flow structure →
   `ampla_project.normalize.flow`
+- `File.ItemId.Fullname.Type.xslt` → `ampla_project.outputs.item_mapping`
 - Security extraction → `ampla_project.normalize.security`
 - Context, translations, version extraction → `ampla_project.normalize.context`
 - Translation injection and supported `DisplayName` generation → `ampla_project.normalize.items`
 
 ## ❗ Missing (Normalization Only)
-- `File.ItemId.Fullname.Type.xslt` — helper for ID/fullname/type mapping not implemented
-
-## Priority
-- **Medium**: Helper templates (only needed for legacy‑compatible output)
+- None currently identified in the documented normalization scope.
 
 ---
 
@@ -182,7 +180,6 @@ These belong to the **legacy reporting UI**, not the normalization engine.
 
 # 10. Recommended Priority (Realistic Scope)
 
-1. **Authstore normalization** (optional)
-2. **Translation injection** (optional)
-3. **Helper templates** (optional)
-4. Everything else → **explicitly out of scope**
+1. **Remaining translation edge cases** (basic translation support exists)
+2. Revalidate source-specific normalization cases as new representative fixtures become available.
+3. Everything else → **explicitly out of scope**

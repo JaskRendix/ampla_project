@@ -16,6 +16,7 @@ All **HTML, Excel, DotML, mindmap, and reporting templates** are explicitly **ou
 | `Document.Common.xslt` | Shared normalization helpers | `normalize.context` |
 | `Document.Properties.xslt` | Property extraction | `normalize.properties` |
 | `Document.ItemTypes.xslt` | Item type resolution | `normalize.items` |
+| `File.ItemId.Fullname.Type.xslt` | Pipe-delimited ID/full-name/type mapping | `outputs.item_mapping` |
 
 ---
 

@@ -13,6 +13,7 @@ from ..model.security import (
     SecurityScope,
     SecurityUser,
 )
+from .item_mapping import item_id_fullname_type_rows
 
 
 def project_to_json(project: Project) -> dict[str, Any]:
@@ -50,6 +51,7 @@ def project_to_json(project: Project) -> dict[str, Any]:
         },
         "flow_graph": project.flow_graph,
         "flow": [_flow_node_to_dict(node) for node in project.flow],
+        "item_id_fullname_type": item_id_fullname_type_rows(project),
         "security": security,
         "platform_version": project.platform_version,
         "applications_version": project.applications_version,

@@ -1,0 +1,11 @@
+<Project>
+  <ClassDefinition id="class-base" name="BaseClass" type="Example.Base">
+    <ClassDefinition id="class-nested" name="NestedClass" type="Example.Nested" />
+  </ClassDefinition>
+  <ClassDefinition id="class-other" name="OtherClass" type="Example.Other" />
+  <Item id="area" name="Area" type="Folder">
+    <Item id="source" name="Source" type="Example.Source" />
+    <Item id="nested" name="Nested" type="Example.NestedItem" />
+  </Item>
+  <Item id="standalone" name="Standalone" type="Example.Standalone" />
+</Project>

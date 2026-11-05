@@ -64,6 +64,24 @@ def test_project_api_exposes_source_compatible_flow_tree():
     assert flow_response.json() == data["flow_graph"]
 
 
+def test_project_api_serializes_item_id_fullname_type_mapping():
+    path = str(Path("tests/data/parity/item_mapping.xml").resolve())
+    response = client.get("/project", params={"path": path})
+
+    assert response.status_code == 200
+    rows = response.json()["item_id_fullname_type"]
+    assert rows[0] == {
+        "item_id": "class-base",
+        "full_name": "BaseClass",
+        "type": "Example.Base",
+    }
+    assert rows[-1] == {
+        "item_id": "standalone",
+        "full_name": "Standalone",
+        "type": "Example.Standalone",
+    }
+
+
 def test_items():
     r = client.get("/items", params={"path": SAMPLE})
     assert r.status_code == 200

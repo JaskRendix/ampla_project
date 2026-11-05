@@ -1,0 +1,11 @@
+<Project>
+  <Item id="class-base" name="BaseClass" type="Example.Base" fullName="BaseClass" class="true">
+    <Item id="class-nested" name="NestedClass" type="Example.Nested" fullName="BaseClass.NestedClass" class="true" />
+  </Item>
+  <Item id="class-other" name="OtherClass" type="Example.Other" fullName="OtherClass" class="true" />
+  <Item id="area" name="Area" type="Folder" fullName="Area">
+    <Item id="source" name="Source" type="Example.Source" fullName="Area.Source" />
+    <Item id="nested" name="Nested" type="Example.NestedItem" fullName="Area.Nested" />
+  </Item>
+  <Item id="standalone" name="Standalone" type="Example.Standalone" fullName="Standalone" />
+</Project>

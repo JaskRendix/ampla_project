@@ -288,7 +288,7 @@ The Python package implements the core normalization pipeline, but `src` contain
 | `src/StyleSheets/Authstore.Normalize.xslt` | normalization | `ampla_project.normalize.security` (optional AuthStore input) |
 | `src/StyleSheets/Project.Translations.xslt` | HTML translation output | out of scope |
 | `src/StyleSheets/Translate.Project.xslt` | DisplayName translation injection | `ampla_project.normalize.context`, `ampla_project.normalize.items` |
-| `src/StyleSheets/File.ItemId.Fullname.Type.xslt` | normalization helper | not implemented |
+| `src/StyleSheets/File.ItemId.Fullname.Type.xslt` | ID/full-name/type mapping | `ampla_project.outputs.item_mapping` |
 
 ### Items, properties, and inventory
 | XSLT file | Category | Python module(s) / status |

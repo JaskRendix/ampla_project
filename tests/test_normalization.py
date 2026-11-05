@@ -4,6 +4,7 @@ from pathlib import Path
 from lxml.etree import fromstring, parse
 
 from ampla_project.normalize import normalize
+from ampla_project.outputs.item_mapping import item_id_fullname_type_to_text
 from ampla_project.outputs.json import project_to_json
 
 
@@ -372,6 +373,7 @@ def test_source_specific_item_transforms_match_parity_fixture():
 
     assert project.items["resolver"].properties["Action"].value == "Module"
     assert project.items["resolver"].properties["ResolverOperation"].value == "Sum"
+
     assert project.items["user"].properties["Authentication"].value == (
         "WindowsIntegrated"
     )
@@ -408,6 +410,62 @@ def test_source_specific_item_transforms_match_parity_fixture():
 
     empty_soap = project.items["empty-adapter"].properties["ConnectionString"]
     assert empty_soap.value == "{SOAP}"
+
+
+def test_item_mapping_matches_source_xslt_order_format_and_includes_classes():
+    project = normalize(load_xml(Path("tests/data/parity/item_mapping.xml")))
+    serialized = project_to_json(project)
+    expected_rows = [
+        {"item_id": "class-base", "full_name": "BaseClass", "type": "Example.Base"},
+        {
+            "item_id": "class-nested",
+            "full_name": "BaseClass.NestedClass",
+            "type": "Example.Nested",
+        },
+        {
+            "item_id": "class-other",
+            "full_name": "OtherClass",
+            "type": "Example.Other",
+        },
+        {"item_id": "area", "full_name": "Area", "type": "Folder"},
+        {"item_id": "source", "full_name": "Area.Source", "type": "Example.Source"},
+        {
+            "item_id": "nested",
+            "full_name": "Area.Nested",
+            "type": "Example.NestedItem",
+        },
+        {
+            "item_id": "standalone",
+            "full_name": "Standalone",
+            "type": "Example.Standalone",
+        },
+    ]
+
+    assert serialized["item_id_fullname_type"] == expected_rows
+    expected_text = (
+        "ItemId|Fullname|Type\r\n"
+        "class-base|BaseClass|Example.Base\r\n"
+        "class-nested|BaseClass.NestedClass|Example.Nested\r\n"
+        "class-other|OtherClass|Example.Other\r\n"
+        "area|Area|Folder\r\n"
+        "source|Area.Source|Example.Source\r\n"
+        "nested|Area.Nested|Example.NestedItem\r\n"
+        "standalone|Standalone|Example.Standalone"
+    )
+    assert item_id_fullname_type_to_text(project) == expected_text
+
+    from lxml.etree import XSLT, parse
+
+    source_tree = parse("tests/data/parity/item_mapping_source_normalized.xml")
+    transform = XSLT(parse("src/StyleSheets/File.ItemId.Fullname.Type.xslt"))
+    assert str(transform(source_tree)) == expected_text
+
+
+def test_item_mapping_for_empty_project_returns_header_only():
+    project = normalize(fromstring("<Project />"))
+
+    assert item_id_fullname_type_to_text(project) == "ItemId|Fullname|Type"
+    assert project_to_json(project)["item_id_fullname_type"] == []
 
 
 def test_source_specific_items_serialize_without_changing_existing_fields():

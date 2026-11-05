@@ -142,6 +142,18 @@
       ]
     }
   ],
+  "item_id_fullname_type": [
+    {
+      "item_id": "A",
+      "full_name": "A",
+      "type": "Test"
+    },
+    {
+      "item_id": "B",
+      "full_name": "B",
+      "type": "Test"
+    }
+  ],
   "security": {
     "users": {},
     "scopes": {
