@@ -1,6 +1,6 @@
 from pathlib import Path
 
-from lxml.etree import parse
+from lxml.etree import XSLT, parse
 
 from ampla_project.model.item import Item, Property
 from ampla_project.normalize import normalize
@@ -250,3 +250,63 @@ def test_normalization_without_authstore_keeps_security_json_shape():
 
     assert set(security) == {"scopes", "users"}
     assert set(security["scopes"]["scope-one"]) == {"id", "name", "full_name"}
+
+
+def test_security_users_and_scopes_follow_source_sort_precedence():
+    fixture_path = Path("tests/data/parity/security_ordering.xml")
+    project = normalize(parse(fixture_path).getroot())
+    security = project.security
+
+    source_transform = XSLT(parse("src/StyleSheets/Project.Security.xslt"))
+    source_security = source_transform(parse(fixture_path))
+    expected_user_ids = source_security.xpath("//Users/User/@id")
+    expected_scope_ids = source_security.xpath("//Scopes/Scope/@scopeId")
+
+    assert (
+        list(security["users"])
+        == expected_user_ids
+        == [
+            "user-first",
+            "user-second",
+            "user-zed",
+            "user-alpha",
+            "user-zulu",
+            "user-ten",
+        ]
+    )
+    assert (
+        list(security["scopes"])
+        == expected_scope_ids
+        == [
+            "00000000-0000-0000-0000-000000000000",
+            "scope-first",
+            "scope-second",
+            "scope-zed",
+            "scope-alpha",
+            "scope-zulu",
+            "scope-ten",
+        ]
+    )
+
+
+def test_security_ordering_is_preserved_in_json_serialization():
+    project = normalize(_load_fixture("security_ordering.xml"))
+    security = project_to_json(project)["security"]
+
+    assert list(security["users"]) == [
+        "user-first",
+        "user-second",
+        "user-zed",
+        "user-alpha",
+        "user-zulu",
+        "user-ten",
+    ]
+    assert list(security["scopes"]) == [
+        "00000000-0000-0000-0000-000000000000",
+        "scope-first",
+        "scope-second",
+        "scope-zed",
+        "scope-alpha",
+        "scope-zulu",
+        "scope-ten",
+    ]

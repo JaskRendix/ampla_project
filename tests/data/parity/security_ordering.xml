@@ -1,0 +1,54 @@
+<Project>
+  <Item id="parent-z" name="Parent Z" fullName="Parent Z" type="Folder">
+    <Item id="user-zed" name="Zed" type="Citect.Ampla.StandardItems.User">
+      <Property name="DisplayOrder">0</Property>
+      <Property name="Identity">DOMAIN\zed|S-1-5-21-1|&lt;NULL&gt;</Property>
+    </Item>
+    <Item id="user-zulu" name="Zulu" type="Citect.Ampla.StandardItems.User">
+      <Property name="DisplayOrder">2</Property>
+      <Property name="Identity">DOMAIN\zulu|S-1-5-21-2|&lt;NULL&gt;</Property>
+    </Item>
+    <Item id="user-alpha" name="Alpha" type="Citect.Ampla.StandardItems.User">
+      <Property name="DisplayOrder">2</Property>
+      <Property name="Identity">DOMAIN\alpha|S-1-5-21-3|&lt;NULL&gt;</Property>
+    </Item>
+    <Item id="user-ten" name="Ten" type="Citect.Ampla.StandardItems.User">
+      <Property name="DisplayOrder">10</Property>
+      <Property name="Identity">DOMAIN\ten|S-1-5-21-6|&lt;NULL&gt;</Property>
+    </Item>
+    <Item id="scope-zed" name="Zed Scope" type="Scope">
+      <Property name="DisplayOrder">0</Property>
+      <Property name="InheritPermissions">False</Property>
+    </Item>
+    <Item id="scope-zulu" name="Zulu Scope" type="Scope">
+      <Property name="DisplayOrder">2</Property>
+      <Property name="InheritPermissions">False</Property>
+    </Item>
+    <Item id="scope-alpha" name="Alpha Scope" type="Scope">
+      <Property name="DisplayOrder">2</Property>
+      <Property name="InheritPermissions">False</Property>
+    </Item>
+    <Item id="scope-ten" name="Ten Scope" type="Scope">
+      <Property name="DisplayOrder">10</Property>
+      <Property name="InheritPermissions">False</Property>
+    </Item>
+  </Item>
+  <Item id="parent-a" name="Parent A" fullName="Parent A" type="Folder">
+    <Item id="user-second" name="Second" type="Citect.Ampla.StandardItems.User">
+      <Property name="DisplayOrder">5</Property>
+      <Property name="Identity">DOMAIN\second|S-1-5-21-5|&lt;NULL&gt;</Property>
+    </Item>
+    <Item id="user-first" name="First" type="Citect.Ampla.StandardItems.User">
+      <Property name="DisplayOrder">1</Property>
+      <Property name="Identity">DOMAIN\first|S-1-5-21-4|&lt;NULL&gt;</Property>
+    </Item>
+    <Item id="scope-second" name="Second Scope" type="Scope">
+      <Property name="DisplayOrder">5</Property>
+      <Property name="InheritPermissions">False</Property>
+    </Item>
+    <Item id="scope-first" name="First Scope" type="Scope">
+      <Property name="DisplayOrder">1</Property>
+      <Property name="InheritPermissions">False</Property>
+    </Item>
+  </Item>
+</Project>

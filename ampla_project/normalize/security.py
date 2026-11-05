@@ -1,5 +1,7 @@
 from __future__ import annotations
 
+import math
+
 from lxml.etree import Element
 
 from ..model.item import Item
@@ -49,7 +51,7 @@ def _extract_users(items: dict[str, Item]) -> dict[str, SecurityUser]:
     """
     users: dict[str, SecurityUser] = {}
 
-    for item in items.values():
+    for item in _source_ordered_items(items):
         if item.type != "Citect.Ampla.StandardItems.User":
             continue
 
@@ -91,7 +93,7 @@ def _extract_scopes(items: dict[str, Item]) -> dict[str, SecurityScope]:
     )
 
     # Explicit scopes
-    for item in items.values():
+    for item in _source_ordered_items(items):
         inherit = item.properties.get("InheritPermissions")
         if inherit and inherit.value == "False":
             scopes[item.id] = SecurityScope(
@@ -101,6 +103,41 @@ def _extract_scopes(items: dict[str, Item]) -> dict[str, SecurityScope]:
             )
 
     return scopes
+
+
+def _parent_full_names(items: dict[str, Item]) -> dict[str, str]:
+    parent_full_names = {}
+    for parent in items.values():
+        for child in parent.children:
+            parent_full_names.setdefault(child.id, parent.full_name)
+    return parent_full_names
+
+
+def _source_ordered_items(items: dict[str, Item]) -> list[Item]:
+    parent_full_names = _parent_full_names(items)
+    return sorted(
+        items.values(),
+        key=lambda item: _source_item_sort_key(item, parent_full_names),
+    )
+
+
+def _source_item_sort_key(
+    item: Item, parent_full_names: dict[str, str]
+) -> tuple[str, int, float, str]:
+    display_order_prop = item.properties.get("DisplayOrder")
+    try:
+        display_order = (
+            float(display_order_prop.value) if display_order_prop else math.nan
+        )
+    except (TypeError, ValueError):
+        display_order = math.nan
+    numeric_key = (0, 0.0) if math.isnan(display_order) else (1, display_order)
+    return (
+        parent_full_names.get(item.id, ""),
+        numeric_key[0],
+        numeric_key[1],
+        item.name or "",
+    )
 
 
 def _merge_authstore(

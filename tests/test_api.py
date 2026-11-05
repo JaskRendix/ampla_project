@@ -124,6 +124,38 @@ def test_security():
     assert isinstance(r.json(), dict)
 
 
+def test_security_api_preserves_source_user_and_scope_ordering():
+    path = str(Path("tests/data/parity/security_ordering.xml").resolve())
+    expected_user_ids = [
+        "user-first",
+        "user-second",
+        "user-zed",
+        "user-alpha",
+        "user-zulu",
+        "user-ten",
+    ]
+    expected_scope_ids = [
+        "00000000-0000-0000-0000-000000000000",
+        "scope-first",
+        "scope-second",
+        "scope-zed",
+        "scope-alpha",
+        "scope-zulu",
+        "scope-ten",
+    ]
+
+    project_response = client.get("/project", params={"path": path})
+    security_response = client.get("/security", params={"path": path})
+
+    assert project_response.status_code == 200
+    assert security_response.status_code == 200
+    project_security = project_response.json()["security"]
+    security = security_response.json()
+    assert security == project_security
+    assert list(security["users"]) == expected_user_ids
+    assert list(security["scopes"]) == expected_scope_ids
+
+
 def test_metrics():
     r = client.get("/metrics", params={"path": SAMPLE})
     assert r.status_code == 200
