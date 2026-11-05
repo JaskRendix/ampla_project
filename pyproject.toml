@@ -5,6 +5,11 @@ description = "Ampla project normalization engine"
 authors = [
     { name = "Giorgio" }
 ]
+license = { file = "LICENSE" }
+classifiers = [
+    "License :: OSI Approved :: MIT License",
+    "Programming Language :: Python :: 3",
+]
 requires-python = ">=3.12"
 dependencies = [
     "lxml",
