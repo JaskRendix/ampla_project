@@ -54,6 +54,24 @@ class ExpressionModel:
 
 
 @dataclass
+class FlowNode:
+    item_id: str
+    name: str | None
+    type: str | None
+    full_name: str
+    hash: str
+    definition: str | None
+    translation: str | None
+    links: list["FlowLink"] = field(default_factory=list)
+
+
+@dataclass
+class FlowLink:
+    property_name: str | None
+    item: FlowNode
+
+
+@dataclass
 class ProjectMetrics:
     """Calculated statistics for the project."""
 
@@ -101,6 +119,7 @@ class Project:
 
     metrics: ProjectMetrics = field(default_factory=ProjectMetrics)
     expression_model: ExpressionModel | None = None
+    flow: list[FlowNode] = field(default_factory=list)
 
     def get_item(self, item_id: str) -> Item | None:
         return self.items.get(item_id)

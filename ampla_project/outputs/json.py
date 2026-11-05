@@ -3,7 +3,7 @@ from __future__ import annotations
 from typing import Any
 
 from ..model.item import Item, ItemLink, Property
-from ..model.project import ExpressionModel, Project
+from ..model.project import ExpressionModel, FlowNode, Project
 from ..model.security import (
     SecurityMember,
     SecurityOperation,
@@ -49,6 +49,7 @@ def project_to_json(project: Project) -> dict[str, Any]:
             cls_id: _item_to_dict(cls) for cls_id, cls in project.classes.items()
         },
         "flow_graph": project.flow_graph,
+        "flow": [_flow_node_to_dict(node) for node in project.flow],
         "security": security,
         "platform_version": project.platform_version,
         "applications_version": project.applications_version,
@@ -57,6 +58,25 @@ def project_to_json(project: Project) -> dict[str, Any]:
     if project.expression_model is not None:
         result["expression_model"] = _expression_model_to_dict(project.expression_model)
     return result
+
+
+def _flow_node_to_dict(node: FlowNode) -> dict[str, Any]:
+    return {
+        "item_id": node.item_id,
+        "name": node.name,
+        "type": node.type,
+        "full_name": node.full_name,
+        "hash": node.hash,
+        "definition": node.definition,
+        "translation": node.translation,
+        "links": [
+            {
+                "property_name": link.property_name,
+                "item": _flow_node_to_dict(link.item),
+            }
+            for link in node.links
+        ],
+    }
 
 
 def _expression_model_to_dict(model: ExpressionModel) -> dict[str, Any]:

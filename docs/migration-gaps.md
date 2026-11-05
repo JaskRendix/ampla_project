@@ -19,7 +19,8 @@ Legacy **reporting, HTML, Excel, DotML, and mindmap** templates are explicitly *
 - Expression formatting / `ExpressionConfig` → `ampla_project.normalize.expressions`
 - Expression dependencies, source-item relationships, declared streams, and stream
   property links → `ampla_project.normalize.expression_model`
-- Flow graph creation → `ampla_project.normalize.flow`
+- Flow graph and source-compatible root/immediate-link flow structure →
+  `ampla_project.normalize.flow`
 - Security extraction → `ampla_project.normalize.security`
 - Context, translations, version extraction → `ampla_project.normalize.context`
 - Translation injection and supported `DisplayName` generation → `ampla_project.normalize.items`
@@ -73,8 +74,14 @@ Legacy **reporting, HTML, Excel, DotML, and mindmap** templates are explicitly *
 # 4. Flow & Graph Resolution (In Scope)
 
 ## ✔ Implemented
-- Flow graph generation (`Project.Flow.xslt`)
+- Flow graph generation, root selection, ordering, and immediate child links
+  (`Project.Flow.xslt`)
 - LinkFrom/LinkTo behavior (`Project.LinkFrom.xslt`, `Project.LinkTo.xslt`)
+
+`Project.Flow.xslt` passes `current` to `alreadyVisited`, whose declared parameter
+is `hash`. The source transform therefore emits only immediate linked items under
+each root. The normalized `flow` model preserves this observed behavior; the
+separate flat `flow_graph` and `/flow` API remain unchanged.
 
 ## ❗ Missing
 - None (normalization layer complete)

@@ -1,0 +1,23 @@
+<Project>
+  <Item id="child-b" name="ChildB" type="Consumer">
+    <Property name="SecondInput">
+      <ItemLink targetID="root-z" />
+    </Property>
+    <Property name="FirstInput">
+      <ItemLink targetID="root-z" />
+    </Property>
+  </Item>
+  <Item id="root-z" name="Alpha" type="Source.Z" />
+  <Item id="unlinked" name="Unlinked" type="Source.A" />
+  <Item id="child-a" name="ChildA" type="Consumer">
+    <Property name="RootInput">
+      <ItemLink targetID="root-a" />
+    </Property>
+  </Item>
+  <Item id="root-a" name="Zeta" type="Source.A" />
+  <Item id="grandchild" name="Grandchild" type="Consumer">
+    <Property name="ChildInput">
+      <ItemLink targetID="child-b" />
+    </Property>
+  </Item>
+</Project>

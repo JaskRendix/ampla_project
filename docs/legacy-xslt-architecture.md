@@ -302,7 +302,7 @@ The Python package implements the core normalization pipeline, but `src` contain
 ### Flow and links
 | XSLT file | Category | Python module(s) / status |
 |---|---|---|
-| `src/StyleSheets/Project.Flow.xslt` | flow graph | `ampla_project.normalize.flow` |
+| `src/StyleSheets/Project.Flow.xslt` | flow roots and immediate links | `ampla_project.normalize.flow` |
 | `src/StyleSheets/Project.LinkFrom.xslt` | link forward | `ampla_project.normalize.links.build_link_from_to` |
 | `src/StyleSheets/Project.LinkTo.xslt` | link reverse | `ampla_project.normalize.links.build_link_from_to` |
 | `src/Build/BuildToDotML.xslt` | graph export | not implemented |

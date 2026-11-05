@@ -1,0 +1,16 @@
+<Project>
+  <Item id="root" name="Root" type="Source" />
+  <Item id="cycle-a" name="CycleA" type="Node">
+    <Property name="RootInput">
+      <ItemLink targetID="root" />
+    </Property>
+    <Property name="CycleInput">
+      <ItemLink targetID="cycle-b" />
+    </Property>
+  </Item>
+  <Item id="cycle-b" name="CycleB" type="Node">
+    <Property name="CycleInput">
+      <ItemLink targetID="cycle-a" />
+    </Property>
+  </Item>
+</Project>

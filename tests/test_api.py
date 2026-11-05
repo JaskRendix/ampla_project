@@ -46,6 +46,24 @@ def test_project():
     assert isinstance(data["properties"], dict)
 
 
+def test_project_api_exposes_source_compatible_flow_tree():
+    path = str(Path("tests/data/parity/flow_cycle.xml").resolve())
+    response = client.get("/project", params={"path": path})
+
+    assert response.status_code == 200
+    data = response.json()
+    assert data["flow"][0]["item_id"] == "root"
+    assert data["flow"][0]["links"][0]["property_name"] == "RootInput"
+    assert data["flow_graph"] == {
+        "root": ["cycle-a"],
+        "cycle-a": ["cycle-b"],
+        "cycle-b": ["cycle-a"],
+    }
+    flow_response = client.get("/flow", params={"path": path})
+    assert flow_response.status_code == 200
+    assert flow_response.json() == data["flow_graph"]
+
+
 def test_items():
     r = client.get("/items", params={"path": SAMPLE})
     assert r.status_code == 200

@@ -25,6 +25,7 @@ Legacy HTML, Excel, DotML, metrics, and inventory exports are not included.
 - clear project model  
 - deterministic normalization pipeline  
 - LinkFrom and LinkTo graph construction from nested `ItemLink` XML
+- Source-compatible flow root and immediate-link structure
 - expression reference resolution and dependency/stream relationships
 - security model extraction  
 - source-specific DecisionMatrix, resolver, user, OLE DB, and Favorites normalization

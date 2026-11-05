@@ -1,0 +1,20 @@
+<Project>
+  <Item id="consumer-z" name="ConsumerZ" type="Consumer">
+    <Property name="Input">
+      <ItemLink targetID="root-z" />
+    </Property>
+  </Item>
+  <Item id="root-z" name="Zeta" type="SameType" />
+  <Item id="consumer-a" name="ConsumerA" type="Consumer">
+    <Property name="Input">
+      <ItemLink targetID="root-a" />
+    </Property>
+  </Item>
+  <Item id="root-a" name="Alpha" type="SameType" />
+  <Item id="consumer-first" name="ConsumerFirst" type="Consumer">
+    <Property name="Input">
+      <ItemLink targetID="root-first" />
+    </Property>
+  </Item>
+  <Item id="root-first" name="Zulu" type="EarlierType" />
+</Project>

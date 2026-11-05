@@ -116,6 +116,32 @@
       "A"
     ]
   },
+  "flow": [
+    {
+      "item_id": "B",
+      "name": "B",
+      "type": "Test",
+      "full_name": "B",
+      "hash": "9d5ed678",
+      "definition": null,
+      "translation": null,
+      "links": [
+        {
+          "property_name": "Input",
+          "item": {
+            "item_id": "A",
+            "name": "A",
+            "type": "Test",
+            "full_name": "A",
+            "hash": "7fc56270",
+            "definition": null,
+            "translation": null,
+            "links": []
+          }
+        }
+      ]
+    }
+  ],
   "security": {
     "users": {},
     "scopes": {

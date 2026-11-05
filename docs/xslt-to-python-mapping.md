@@ -55,7 +55,7 @@ All **HTML, Excel, DotML, mindmap, and reporting templates** are explicitly **ou
 
 | XSLT | Purpose | Python Equivalent |
 |------|---------|------------------|
-| `Project.Flow.xslt` | Flow graph generation | `normalize.flow` |
+| `Project.Flow.xslt` | Flow graph plus source-compatible flow roots and immediate links | `normalize.flow` |
 | `Document.Graphs.DotML.xslt` | Graph structure | `normalize.flow` |
 
 ---

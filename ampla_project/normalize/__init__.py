@@ -6,7 +6,7 @@ from ..model.project import Project
 from .classes import normalize_classes
 from .context import NormalizationContext
 from .expression_model import build_expression_model
-from .flow import build_flow_graph
+from .flow import build_flow_graph, build_flow_tree
 from .items import normalize_items
 from .links import build_link_from_to, resolve_item_links
 from .metrics import calculate_metrics
@@ -46,6 +46,7 @@ def normalize(
     expression_model = build_expression_model(ctx)
 
     flow_graph = build_flow_graph(ctx, items)
+    flow = build_flow_tree(items)
 
     security = normalize_security(ctx, items, authstore_doc)
 
@@ -58,6 +59,7 @@ def normalize(
         security=security,
         metrics=metrics,
         expression_model=expression_model,
+        flow=flow,
         platform_version=_get_platform_version(root),
         applications_version=_get_applications_version(root),
         properties=_extract_project_properties(root),
