@@ -21,6 +21,7 @@ class NormalizationContext:
 
     # Indexes (equivalent to xsl:key)
     items_by_id: dict[str, Element] = field(default_factory=dict)
+    items_by_full_name: dict[str, list[Element]] = field(default_factory=dict)
     items_by_type: dict[str, list[Element]] = field(default_factory=dict)
     items_by_reference: dict[str, list[Element]] = field(default_factory=dict)
     classes_by_id: dict[str, Element] = field(default_factory=dict)
@@ -90,12 +91,24 @@ class NormalizationContext:
 
             if item_id:
                 self.items_by_id[item_id] = elem
+                full_name = self._get_item_full_name(elem)
+                self.items_by_full_name.setdefault(full_name, []).append(elem)
 
             if item_type:
                 self.items_by_type.setdefault(item_type, []).append(elem)
 
             if reference:
                 self.items_by_reference.setdefault(reference, []).append(elem)
+
+    @staticmethod
+    def _get_item_full_name(elem: Element) -> str:
+        names = [
+            ancestor.get("name")
+            for ancestor in reversed(list(elem.iterancestors(tag="Item")))
+            if ancestor.get("id")
+        ]
+        names.append(elem.get("name"))
+        return ".".join(names)
 
     def _index_classes(self):
         """

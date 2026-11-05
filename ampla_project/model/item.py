@@ -41,7 +41,7 @@ class Property:
     item_links: list[ItemLink] = field(default_factory=list)
 
     # Optional raw XML for special cases (SOAP, ExpressionConfig, etc.)
-    extra_xml: object | None = None
+    extra_xml: dict[str, object] | None = None
 
 
 @dataclass

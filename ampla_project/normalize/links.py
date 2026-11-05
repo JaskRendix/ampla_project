@@ -32,8 +32,7 @@ def build_link_from_to(ctx: NormalizationContext, items: dict[str, Item]) -> Non
     for item in items.values():
         for prop in item.properties.values():
             for link in prop.item_links:
-                if link.target_id:
-                    item.link_from.append(link)
+                item.link_from.append(link)
 
     # Build reverse references
     for item in items.values():
@@ -50,7 +49,7 @@ def build_link_from_to(ctx: NormalizationContext, items: dict[str, Item]) -> Non
 
 
 def _resolve_single_link(
-    ctx: NormalizationContext, items: dict[str, Item], item: Item, link: ItemLink
+    _ctx: NormalizationContext, items: dict[str, Item], item: Item, link: ItemLink
 ) -> None:
     """
     Resolve a single ItemLink:
@@ -76,8 +75,8 @@ def _resolve_single_link(
             link.broken_target = True
 
     # 3. Relative path resolution (Parent.Parent.this)
-    if getattr(link, "relative_path", None):
-        resolved = _resolve_relative_path(ctx, items, item, link.relative_path)
+    if link.relative_path:
+        resolved = _resolve_relative_path(items, item, link.relative_path)
         if resolved:
             link.target_id = resolved.id
             link.absolute_path = resolved.full_name
@@ -96,7 +95,7 @@ def _find_item_by_fullname(items: dict[str, Item], full_name: str) -> Item | Non
 
 
 def _resolve_relative_path(
-    ctx: NormalizationContext, items: dict[str, Item], item: Item, path: str
+    items: dict[str, Item], item: Item, path: str
 ) -> Item | None:
     """
     Implements the XSLT logic from findRelativeId:
@@ -107,29 +106,27 @@ def _resolve_relative_path(
     - child paths
     """
 
-    parts = path.split(".")
-    ancestors = _get_ancestor_chain(ctx, item)
+    ancestors = _get_ancestor_chain(items, item)
+    index = len(ancestors)
 
-    index = len(ancestors) - 1  # start at current item
+    while path.startswith("Parent."):
+        path = path.removeprefix("Parent.")
+        index -= 1
 
-    for part in parts:
-        if part == "Parent":
-            index -= 1
-            if index < 0:
-                return None
-        elif part == "this":
-            continue
-        else:
-            # treat as absolute fullName
-            return _find_item_by_fullname(items, path)
+    if path == "this":
+        return ancestors[index - 1] if 0 < index <= len(ancestors) else None
+    if path == "Parent":
+        return ancestors[index - 2] if 1 < index <= len(ancestors) else None
+    if index <= 0:
+        return _find_item_by_fullname(items, path)
+    if index > len(ancestors):
+        return None
 
-    if 0 <= index < len(ancestors):
-        return ancestors[index]
-
-    return None
+    base = ancestors[index - 1]
+    return _find_item_by_fullname(items, f"{base.full_name}.{path}")
 
 
-def _get_ancestor_chain(ctx: NormalizationContext, item: Item) -> list[Item]:
+def _get_ancestor_chain(items: dict[str, Item], item: Item) -> list[Item]:
     """
     Build ancestor chain from root → item.
     """
@@ -137,12 +134,13 @@ def _get_ancestor_chain(ctx: NormalizationContext, item: Item) -> list[Item]:
     current = item
     while current:
         chain.append(current)
-        parent = _find_parent(ctx, current)
+        parent = _find_parent(items, current)
         current = parent
+    chain.reverse()
     return chain
 
 
-def _find_parent(ctx: NormalizationContext, item: Item) -> Item | None:
+def _find_parent(items: dict[str, Item], item: Item) -> Item | None:
     """
     Find parent Item by checking fullName prefix.
     """
@@ -151,4 +149,4 @@ def _find_parent(ctx: NormalizationContext, item: Item) -> Item | None:
         return None
 
     parent_full = ".".join(parts[:-1])
-    return _find_item_by_fullname(ctx.items_by_id, parent_full)
+    return _find_item_by_fullname(items, parent_full)

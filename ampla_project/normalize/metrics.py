@@ -30,7 +30,7 @@ def calculate_metrics(
         # 2. Link health
         for link in item.link_from:
             total_links += 1
-            if link.broken_target or link.broken_absolute:
+            if link.broken_target or link.broken_absolute or link.broken_relative:
                 broken_links += 1
 
         # 3. Orphan detection

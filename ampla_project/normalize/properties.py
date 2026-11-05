@@ -18,7 +18,6 @@ def normalize_property(
     name = prop_elem.get("name")
     value = (prop_elem.text or "").strip()
     attrs = {k: v for k, v in prop_elem.attrib.items() if k != "name"}
-    item_links: list[ItemLink] = []
 
     # 1. SOAP normalization
     if (
@@ -58,8 +57,18 @@ def normalize_property(
     if prop_elem.find("HistoricalExpressionConfig/ExpressionConfig") is not None:
         return _normalize_expression_config_property(ctx, prop_elem, name, attrs)
 
-    # 8. Default: simple property
-    return Property(name=name, value=value, attributes=attrs, item_links=item_links)
+    # 8. Preserve nested XML and extract ordinary property links.
+    item_links = _extract_item_links(prop_elem, name)
+    if not item_links and name != "DeriveSpecificationFrom":
+        item_links = _extract_full_name_link(ctx, name, value)
+    extra_xml = _element_to_dict(prop_elem) if len(prop_elem) else None
+    return Property(
+        name=name,
+        value=value,
+        attributes=attrs,
+        item_links=item_links,
+        extra_xml=extra_xml,
+    )
 
 
 def _normalize_soap_property(prop_elem: Element) -> Property:
@@ -170,7 +179,13 @@ def _normalize_historical_expression(
         attrs = dict(attrs)
         attrs["message"] = "No expression specified for Manual records."
 
-    return Property(name=name, value=None, attributes=attrs, item_links=[])
+    return Property(
+        name=name,
+        value=None,
+        attributes=attrs,
+        item_links=_extract_item_links(prop_elem, name),
+        extra_xml=_element_to_dict(prop_elem) if len(prop_elem) else None,
+    )
 
 
 def _normalize_expression_config_property(
@@ -183,4 +198,50 @@ def _normalize_expression_config_property(
     - getProjectFullName
     """
     normalize_expression_config(ctx, prop_elem)
-    return Property(name=name, value=None, attributes=attrs, item_links=[])
+    return Property(
+        name=name,
+        value=None,
+        attributes=attrs,
+        item_links=_extract_item_links(prop_elem, name),
+        extra_xml=_element_to_dict(prop_elem),
+    )
+
+
+def _extract_item_links(prop_elem: Element, property_name: str) -> list[ItemLink]:
+    links: list[ItemLink] = []
+    for link_elem in prop_elem.findall(".//ItemLink"):
+        links.append(
+            ItemLink(
+                target_id=link_elem.get("targetID") or link_elem.get("targetId"),
+                absolute_path=link_elem.get("absolutePath"),
+                property_name=property_name,
+                relative_path=link_elem.get("relativePath"),
+                broken_target=link_elem.get("broken-targetID") == "true",
+                broken_absolute=link_elem.get("broken-absolutePath") == "true",
+                broken_relative=link_elem.get("broken-relativePath") == "true",
+            )
+        )
+    return links
+
+
+def _extract_full_name_link(
+    ctx: NormalizationContext, property_name: str, value: str
+) -> list[ItemLink]:
+    return [
+        ItemLink(
+            target_id=target.get("id"),
+            absolute_path=value,
+            property_name=property_name,
+        )
+        for target in ctx.items_by_full_name.get(value, [])
+    ]
+
+
+def _element_to_dict(elem: Element) -> dict[str, object]:
+    return {
+        "tag": elem.tag,
+        "attributes": dict(elem.attrib),
+        "text": elem.text,
+        "tail": elem.tail,
+        "children": [_element_to_dict(child) for child in elem],
+    }

@@ -60,7 +60,7 @@ def _property_to_dict(prop: Property) -> dict[str, Any]:
         "value": prop.value,
         "attributes": prop.attributes,
         "item_links": [_itemlink_to_dict(l) for l in prop.item_links],
-        "extra_xml": None,  # not serialized (non‑deterministic)
+        "extra_xml": prop.extra_xml,
     }
 
 

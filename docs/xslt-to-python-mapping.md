@@ -31,8 +31,8 @@ All **HTML, Excel, DotML, mindmap, and reporting templates** are explicitly **ou
 
 | XSLT | Purpose | Python Equivalent |
 |------|---------|------------------|
-| `Project.LinkFrom.xslt` | Reverse link resolution | `normalize.links` |
-| `Project.LinkTo.xslt` | Forward link resolution | `normalize.links` |
+| `Project.LinkFrom.xslt` | Forward link extraction and resolution | `normalize.links` |
+| `Project.LinkTo.xslt` | Reverse link construction | `normalize.links` |
 | `Document.Graphs.DotML.xslt` | Graph link extraction | `normalize.flow` |
 
 ---

@@ -1,0 +1,92 @@
+{
+  "link_targets": ["target", "other", "area", null, null],
+  "link_paths": ["Area.Target", "Area.Other", "Area", "Area.Missing", null],
+  "formula_source_link": {
+    "target_id": "target",
+    "absolute_path": "Area.Target",
+    "property_name": "FormulaSource"
+  },
+  "flow_graph": {
+    "area": ["source"],
+    "source": [],
+    "target": ["source", "source"],
+    "other": ["source"]
+  },
+  "preserved_inputs_xml": {
+    "tag": "Property",
+    "attributes": {
+      "name": "Inputs",
+      "mode": "multi",
+      "valueIsXml": "True"
+    },
+    "text": null,
+    "tail": null,
+    "children": [
+      {
+        "tag": "ItemLinkCollection",
+        "attributes": {
+          "role": "input"
+        },
+        "text": null,
+        "tail": null,
+        "children": [
+          {
+            "tag": "ItemLink",
+            "attributes": {
+              "targetID": "target"
+            },
+            "text": null,
+            "tail": null,
+            "children": [
+              {
+                "tag": "Metadata",
+                "attributes": {
+                  "code": "kept"
+                },
+                "text": "raw",
+                "tail": null,
+                "children": []
+              }
+            ]
+          },
+          {
+            "tag": "ItemLink",
+            "attributes": {
+              "absolutePath": "Area.Other"
+            },
+            "text": null,
+            "tail": null,
+            "children": []
+          },
+          {
+            "tag": "ItemLink",
+            "attributes": {
+              "relativePath": "Parent"
+            },
+            "text": null,
+            "tail": null,
+            "children": []
+          },
+          {
+            "tag": "ItemLink",
+            "attributes": {
+              "absolutePath": "Area.Missing"
+            },
+            "text": null,
+            "tail": null,
+            "children": []
+          },
+          {
+            "tag": "ItemLink",
+            "attributes": {
+              "relativePath": "Parent.Parent"
+            },
+            "text": null,
+            "tail": null,
+            "children": []
+          }
+        ]
+      }
+    ]
+  }
+}

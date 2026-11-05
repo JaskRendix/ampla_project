@@ -92,3 +92,38 @@ def test_metrics():
     r = client.get("/metrics", params={"path": SAMPLE})
     assert r.status_code == 200
     assert isinstance(r.json(), dict)
+
+
+def test_api_preserves_nested_property_links():
+    path = str(Path("tests/data/parity/nested_property_links.xml").resolve())
+
+    project_response = client.get("/project", params={"path": path})
+    assert project_response.status_code == 200
+    project_data = project_response.json()
+    inputs = project_data["items"]["source"]["properties"]["Inputs"]
+    assert [link["target_id"] for link in inputs["item_links"]] == [
+        "target",
+        "other",
+        "area",
+        None,
+        None,
+    ]
+    assert inputs["extra_xml"]["children"][0]["tag"] == "ItemLinkCollection"
+    assert project_data["flow_graph"]["target"] == ["source", "source"]
+
+    items_response = client.get("/items/source", params={"path": path})
+    assert items_response.status_code == 200
+    assert items_response.json()["properties"]["Inputs"]["item_links"] == (
+        inputs["item_links"]
+    )
+
+    links_response = client.get("/links", params={"path": path})
+    assert links_response.status_code == 200
+    assert links_response.json()["source"]["link_from"] == [
+        "target",
+        "other",
+        "area",
+        None,
+        None,
+        "target",
+    ]

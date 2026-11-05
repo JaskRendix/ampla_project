@@ -95,3 +95,57 @@ def test_normalize_builds_nested_item_full_names_and_default_display_order():
     assert project.items["B"].full_name == "Area.Equipment"
     assert project.items["A"].properties["DisplayOrder"].value == "50000"
     assert project.items["B"].properties["DisplayOrder"].value == "50000"
+
+
+def test_nested_property_links_match_parity_fixture_and_serialize():
+    base = Path("tests/data/parity")
+    project = normalize(load_xml(base / "nested_property_links.xml"), None)
+    serialized = project_to_json(project)
+    expected = json.loads((base / "nested_property_links_expected.json").read_text())
+
+    source = project.items["source"]
+    serialized_inputs = serialized["items"]["source"]["properties"]["Inputs"]
+
+    assert [
+        link.target_id for link in source.properties["Inputs"].item_links
+    ] == expected["link_targets"]
+    assert [link.absolute_path for link in source.properties["Inputs"].item_links] == (
+        expected["link_paths"]
+    )
+    assert source.properties["Inputs"].item_links[0].property_name == "Inputs"
+    assert source.properties["Inputs"].item_links[0].target_id == "target"
+    assert source.properties["Inputs"].item_links[1].target_id == "other"
+    assert source.properties["Inputs"].item_links[2].target_id == "area"
+    assert source.properties["Inputs"].item_links[3].broken_absolute
+    assert source.properties["Inputs"].item_links[4].broken_relative
+    assert (
+        source.properties["FormulaSource"].item_links[0].target_id
+        == expected["formula_source_link"]["target_id"]
+    )
+    assert source.properties["DeriveSpecificationFrom"].item_links == []
+
+    assert project.items["source"].link_from == (
+        source.properties["Inputs"].item_links
+        + source.properties["FormulaSource"].item_links
+    )
+    assert [link.target_id for link in project.items["target"].link_to] == [
+        "source",
+        "source",
+    ]
+    assert project.flow_graph == expected["flow_graph"]
+    assert project.metrics.total_links == 6
+    assert project.metrics.broken_links_count == 2
+    assert [
+        (
+            link["target_id"],
+            link["absolute_path"],
+            link["property_name"],
+        )
+        for link in serialized_inputs["item_links"]
+    ] == [
+        (target_id, path, "Inputs")
+        for target_id, path in zip(
+            expected["link_targets"], expected["link_paths"], strict=True
+        )
+    ]
+    assert serialized_inputs["extra_xml"] == expected["preserved_inputs_xml"]

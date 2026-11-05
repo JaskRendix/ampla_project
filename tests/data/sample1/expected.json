@@ -14,8 +14,39 @@
           "name": "Input",
           "value": "",
           "attributes": {},
-          "item_links": [],
-          "extra_xml": null
+          "item_links": [
+            {
+              "target_id": "B",
+              "absolute_path": "B",
+              "property_name": "Input",
+              "broken_target": false,
+              "broken_absolute": false,
+              "broken_relative": false,
+              "event": null,
+              "handler": null,
+              "expression_match": null,
+              "relative_path": null
+            }
+          ],
+          "extra_xml": {
+            "tag": "Property",
+            "attributes": {
+              "name": "Input"
+            },
+            "text": "\n      ",
+            "tail": "\n  ",
+            "children": [
+              {
+                "tag": "ItemLink",
+                "attributes": {
+                  "absolutePath": "B"
+                },
+                "text": null,
+                "tail": "\n    ",
+                "children": []
+              }
+            ]
+          }
         },
         "DisplayOrder": {
           "name": "DisplayOrder",
@@ -26,7 +57,20 @@
         }
       },
       "children": [],
-      "link_from": [],
+      "link_from": [
+        {
+          "target_id": "B",
+          "absolute_path": "B",
+          "property_name": "Input",
+          "broken_target": false,
+          "broken_absolute": false,
+          "broken_relative": false,
+          "event": null,
+          "handler": null,
+          "expression_match": null,
+          "relative_path": null
+        }
+      ],
       "link_to": []
     },
     "B": {
@@ -49,13 +93,28 @@
       },
       "children": [],
       "link_from": [],
-      "link_to": []
+      "link_to": [
+        {
+          "target_id": "A",
+          "absolute_path": "A",
+          "property_name": "Input",
+          "broken_target": false,
+          "broken_absolute": false,
+          "broken_relative": false,
+          "event": null,
+          "handler": null,
+          "expression_match": null,
+          "relative_path": null
+        }
+      ]
     }
   },
   "classes": {},
   "flow_graph": {
     "A": [],
-    "B": []
+    "B": [
+      "A"
+    ]
   },
   "security": {
     "users": {},

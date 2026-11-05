@@ -5,7 +5,6 @@ from lxml.etree import Element
 from ..model.project import Project
 from .classes import normalize_classes
 from .context import NormalizationContext
-from .expressions import normalize_expression_config
 from .flow import build_flow_graph
 from .items import normalize_items
 from .links import build_link_from_to, resolve_item_links
@@ -21,13 +20,12 @@ def normalize(root: Element, language_doc: Element | None = None) -> Project:
     Steps:
       1. Build NormalizationContext (keys, translations, defaults)
       2. Normalize classes
-      3. Normalize items
+      3. Normalize items and their ExpressionConfig properties
       4. Resolve ItemLinks (absolute, targetID, relative)
       5. Build linkFrom / linkTo
-      6. Normalize ExpressionConfig
-      7. Build Flow graph
-      8. Normalize Security
-      9. Return Project model
+      6. Build Flow graph
+      7. Normalize Security
+      8. Return Project model
     """
 
     ctx = NormalizationContext(root=root, language_doc=language_doc)
@@ -39,11 +37,6 @@ def normalize(root: Element, language_doc: Element | None = None) -> Project:
     resolve_item_links(ctx, items)
 
     build_link_from_to(ctx, items)
-
-    for item in items.values():
-        for prop in item.properties.values():
-            if prop.extra_xml is not None:
-                normalize_expression_config(ctx, prop.extra_xml)
 
     flow_graph = build_flow_graph(ctx, items)
 
