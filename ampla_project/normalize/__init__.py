@@ -12,7 +12,11 @@ from .metrics import calculate_metrics
 from .security import normalize_security
 
 
-def normalize(root: Element, language_doc: Element | None = None) -> Project:
+def normalize(
+    root: Element,
+    language_doc: Element | None = None,
+    authstore_doc: Element | None = None,
+) -> Project:
     """
     Top-level normalization entry point.
     This replaces the entire XSLT pipeline with a clean Python pipeline.
@@ -40,7 +44,7 @@ def normalize(root: Element, language_doc: Element | None = None) -> Project:
 
     flow_graph = build_flow_graph(ctx, items)
 
-    security = normalize_security(ctx, items)
+    security = normalize_security(ctx, items, authstore_doc)
 
     metrics = calculate_metrics(items, classes, security)
 

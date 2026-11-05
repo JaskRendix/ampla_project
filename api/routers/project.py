@@ -13,7 +13,10 @@ router = APIRouter()
 
 @router.get("/")
 def get_project(
-    path: str = Query(..., description="Path to Ampla project XML")
+    path: str = Query(..., description="Path to Ampla project XML"),
+    authstore_path: str | None = Query(
+        None, description="Optional path to the Ampla authorization store XML"
+    ),
 ) -> dict[str, Any]:
-    project = load_project(path)
+    project = load_project(path, authstore_path)
     return project_to_json(project)

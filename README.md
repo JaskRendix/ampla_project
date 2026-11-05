@@ -100,6 +100,17 @@ data = project_to_json(project)
 print(data)
 ```
 
+To merge Authorization Store role and scope data, provide the optional AuthStore
+document:
+
+```python
+authstore = parse("AuthStore.xml").getroot()
+project = normalize(root, authstore_doc=authstore)
+```
+
+The `/project` and `/security` API endpoints also accept an optional
+`authstore_path` query parameter.
+
 ## Running Tests
 
 ```

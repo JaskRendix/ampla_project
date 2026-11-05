@@ -4,7 +4,15 @@ from typing import Any
 
 from ..model.item import Item, ItemLink, Property
 from ..model.project import Project
-from ..model.security import SecurityScope, SecurityUser
+from ..model.security import (
+    SecurityMember,
+    SecurityOperation,
+    SecurityRole,
+    SecurityRoleDefinition,
+    SecurityRoleLink,
+    SecurityScope,
+    SecurityUser,
+)
 
 
 def project_to_json(project: Project) -> dict[str, Any]:
@@ -12,6 +20,26 @@ def project_to_json(project: Project) -> dict[str, Any]:
     Convert a fully normalized Project into a JSON‑serializable dict.
     This is the canonical output used for golden‑master tests.
     """
+
+    security = {
+        "users": {
+            uid: _user_to_dict(user) for uid, user in project.security["users"].items()
+        },
+        "scopes": {
+            sid: _scope_to_dict(scope)
+            for sid, scope in project.security["scopes"].items()
+        },
+    }
+    if "authstore_name" in project.security:
+        security["authstore_name"] = project.security["authstore_name"]
+        security["operations"] = {
+            operation_id: _operation_to_dict(operation)
+            for operation_id, operation in project.security["operations"].items()
+        }
+        security["role_definitions"] = {
+            role_id: _role_definition_to_dict(role)
+            for role_id, role in project.security["role_definitions"].items()
+        }
 
     return {
         "items": {
@@ -21,14 +49,7 @@ def project_to_json(project: Project) -> dict[str, Any]:
             cls_id: _item_to_dict(cls) for cls_id, cls in project.classes.items()
         },
         "flow_graph": project.flow_graph,
-        "security": {
-            "users": {
-                uid: _user_to_dict(u) for uid, u in project.security["users"].items()
-            },
-            "scopes": {
-                sid: _scope_to_dict(s) for sid, s in project.security["scopes"].items()
-            },
-        },
+        "security": security,
         "platform_version": project.platform_version,
         "applications_version": project.applications_version,
         "properties": project.properties,
@@ -119,8 +140,64 @@ def _user_to_dict(user: SecurityUser) -> dict[str, Any]:
 
 
 def _scope_to_dict(scope: SecurityScope) -> dict[str, Any]:
-    return {
+    result: dict[str, Any] = {
         "id": scope.id,
         "name": scope.name,
         "full_name": scope.full_name,
+    }
+    if scope.valid is not None:
+        result["valid"] = scope.valid
+    if scope.invalid is not None:
+        result["invalid"] = scope.invalid
+    if scope.roles is not None:
+        result["roles"] = [_role_to_dict(role) for role in scope.roles]
+    return result
+
+
+def _operation_to_dict(operation: SecurityOperation) -> dict[str, Any]:
+    return {
+        "id": operation.id,
+        "name": operation.name,
+        "description": operation.description,
+        "operation_id": operation.operation_id,
+        "role_links": [_role_link_to_dict(link) for link in operation.role_links],
+    }
+
+
+def _role_definition_to_dict(role: SecurityRoleDefinition) -> dict[str, Any]:
+    return {
+        "id": role.id,
+        "name": role.name,
+        "description": role.description,
+        "role_links": [_role_link_to_dict(link) for link in role.role_links],
+        "operations": role.operations,
+    }
+
+
+def _role_link_to_dict(role_link: SecurityRoleLink) -> dict[str, Any]:
+    return {
+        "role_id": role_link.role_id,
+        "name": role_link.name,
+        "role_links": [_role_link_to_dict(link) for link in role_link.role_links],
+        "operations": role_link.operations,
+    }
+
+
+def _role_to_dict(role: SecurityRole) -> dict[str, Any]:
+    return {
+        "role_id": role.role_id,
+        "name": role.name,
+        "description": role.description,
+        "members": [_member_to_dict(member) for member in role.members],
+    }
+
+
+def _member_to_dict(member: SecurityMember) -> dict[str, Any]:
+    return {
+        "sid": member.sid,
+        "type": member.type,
+        "user_id": member.user_id,
+        "user_name": member.user_name,
+        "identity_account": member.identity_account,
+        "resolved_by": member.resolved_by,
     }

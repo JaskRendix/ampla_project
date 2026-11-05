@@ -1,0 +1,36 @@
+<AzAdminManager>
+  <AzApplication Name="Ampla Security">
+    <AzOperation Guid="op-write" Name="Write" Description="Write access">
+      <OperationID>2</OperationID>
+    </AzOperation>
+    <AzOperation Guid="op-read" Name="Read" Description="Read access">
+      <OperationID>1</OperationID>
+    </AzOperation>
+    <AzTask Guid="role-base" Name="Base" Description="Base role" RoleDefinition="True">
+      <OperationLink>op-read</OperationLink>
+    </AzTask>
+    <AzTask Guid="role-editor" Name="Editor" Description="Editor role" RoleDefinition="True">
+      <TaskLink>role-base</TaskLink>
+      <OperationLink>op-write</OperationLink>
+    </AzTask>
+    <AzRole Description="Global editor assignment">
+      <TaskLink>role-editor</TaskLink>
+      <Member>S-1-5-21-111-222-333-1001</Member>
+      <Member>S-1-9-2002</Member>
+      <Member>S-1-5-32-544</Member>
+      <Member>S-1-5-99-unknown</Member>
+    </AzRole>
+    <AzScope Name="scope-one" Description="Security scope for Area One">
+      <AzRole Description="Area reader assignment">
+        <TaskLink>role-base</TaskLink>
+        <Member>S-1-5-21-111-222-333-1001</Member>
+      </AzRole>
+    </AzScope>
+    <AzScope Name="scope-extra" Description="Security scope for External Area">
+      <AzRole Description="External reader assignment">
+        <TaskLink>role-base</TaskLink>
+        <Member>S-1-9-2002</Member>
+      </AzRole>
+    </AzScope>
+  </AzApplication>
+</AzAdminManager>

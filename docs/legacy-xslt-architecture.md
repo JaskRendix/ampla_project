@@ -269,10 +269,10 @@ The Python package implements the core normalization pipeline, but `src` contain
 - Excel-specific workbook rendering and module exports.
 - Browser/document UI rendering and HTML scaffolding.
 - Export helpers for OleDb, RDF, and translated output documents.
-- `Authstore.Normalize.xslt` and project translation transform templates.
+- Project translation transform templates.
 
 ### Missing Python coverage relative to old XSLT architecture
-- There is no Python module dedicated to `authstore` or legacy translation transforms from `src/StyleSheets/Authstore.Normalize.xslt`.
+- AuthStore normalization is integrated into `ampla_project.normalize.security`; project translation transforms remain unimplemented.
 - The Python package does not implement any of the report-generation and export templates present under `src/StyleSheets/Document.*` and `src/StyleSheets/Excel.*`.
 - Graph rendering and DotML generation are absent in Python; these are still only in XSLT (`BuildToDotML.xslt`, `Common.Graphs.DotML.xslt`, etc.).
 - The legacy `Project.OLEDB.xslt`, `Project.RDF.xslt`, and `Document.OleDb.xslt` exports are not represented in `ampla_project`.
@@ -284,7 +284,7 @@ The Python package implements the core normalization pipeline, but `src` contain
 | XSLT file | Category | Python module(s) / status |
 |---|---|---|
 | `src/StyleSheets/Project.Normalize.xslt` | normalization | `ampla_project.normalize.normalize` |
-| `src/StyleSheets/Authstore.Normalize.xslt` | normalization | not implemented |
+| `src/StyleSheets/Authstore.Normalize.xslt` | normalization | `ampla_project.normalize.security` (optional AuthStore input) |
 | `src/StyleSheets/Project.Translations.xslt` | normalization / translation | not implemented |
 | `src/StyleSheets/Translate.Project.xslt` | normalization / translation | not implemented |
 | `src/StyleSheets/File.ItemId.Fullname.Type.xslt` | normalization helper | not implemented |

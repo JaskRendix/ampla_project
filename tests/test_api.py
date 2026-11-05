@@ -189,3 +189,21 @@ def test_api_exposes_source_specific_item_normalization():
         "InputA",
         "InputB",
     ]
+
+
+def test_project_and_security_api_merge_authstore_data():
+    project_path = str(Path("tests/data/parity/authstore_project.xml").resolve())
+    authstore_path = str(Path("tests/data/parity/authstore.xml").resolve())
+    params = {"path": project_path, "authstore_path": authstore_path}
+
+    project_response = client.get("/project", params=params)
+    assert project_response.status_code == 200
+    project_security = project_response.json()["security"]
+    assert project_security["role_definitions"]["role-editor"]["operations"] == [
+        "Write"
+    ]
+    assert project_security["scopes"]["scope-one"]["roles"][0]["role_id"] == "role-base"
+
+    security_response = client.get("/security", params=params)
+    assert security_response.status_code == 200
+    assert security_response.json() == project_security

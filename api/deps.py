@@ -9,6 +9,7 @@ from ampla_project.normalize import normalize
 
 
 @lru_cache(maxsize=16)
-def load_project(path: str) -> Project:
+def load_project(path: str, authstore_path: str | None = None) -> Project:
     root = parse(path).getroot()
-    return normalize(root)
+    authstore_doc = parse(authstore_path).getroot() if authstore_path else None
+    return normalize(root, authstore_doc=authstore_doc)

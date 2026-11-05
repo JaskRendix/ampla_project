@@ -10,6 +10,7 @@ Legacy **reporting, HTML, Excel, DotML, and mindmap** templates are explicitly *
 
 ## ✔ Implemented
 - `Project.Normalize.xslt` → `ampla_project.normalize.items`, `properties`, `classes`, `links`
+- `Authstore.Normalize.xslt` → `ampla_project.normalize.security` (optional AuthStore input)
 - Class normalization → `ampla_project.normalize.classes`
 - Item/property normalization → `ampla_project.normalize.items`, `ampla_project.normalize.properties`
 - Property specifics & subscriptions → `ampla_project.normalize.properties`
@@ -21,12 +22,11 @@ Legacy **reporting, HTML, Excel, DotML, and mindmap** templates are explicitly *
 - Context, translations, version extraction → `ampla_project.normalize.context`
 
 ## ❗ Missing (Normalization Only)
-- `Authstore.Normalize.xslt` — authstore merge logic not implemented
 - `Project.Translations.xslt` / `Translate.Project.xslt` — translation injection not implemented
 - `File.ItemId.Fullname.Type.xslt` — helper for ID/fullname/type mapping not implemented
 
 ## Priority
-- **High**: Authstore + translation logic (if full parity with legacy normalization is required)
+- **High**: Translation injection (if full parity with legacy normalization is required)
 - **Medium**: Helper templates (only needed for legacy‑compatible output)
 
 ---

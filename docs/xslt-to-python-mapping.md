@@ -42,6 +42,7 @@ All **HTML, Excel, DotML, mindmap, and reporting templates** are explicitly **ou
 | XSLT | Purpose | Python Equivalent |
 |------|---------|------------------|
 | `Project.Security.xslt` | Security model extraction | `normalize.security` |
+| `Authstore.Normalize.xslt` | AuthStore merge: operations, role definitions, scope assignments, and members | `normalize.security` |
 | `Document.Security.xslt` | Security details | `normalize.security` |
 | `Document.Security.Text.xslt` | Security text output | `outputs.json` (serialization only) |
 
