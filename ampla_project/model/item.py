@@ -45,6 +45,24 @@ class Property:
 
 
 @dataclass
+class DecisionMatrixInput:
+    id: str
+    name: str
+    hash: str
+    translation: str | None
+    display_order: str
+    item_link: ItemLink
+
+
+@dataclass
+class DecisionMatrixInputRule:
+    name: str
+    display_order: str
+    value: str
+    item_link: ItemLink
+
+
+@dataclass
 class Item:
     """
     Represents a fully normalized Item.
@@ -64,6 +82,10 @@ class Item:
 
     properties: dict[str, Property] = field(default_factory=dict)
     children: list["Item"] = field(default_factory=list)
+    decision_matrix_inputs: list[DecisionMatrixInput] = field(default_factory=list)
+    decision_matrix_input_rules: list[DecisionMatrixInputRule] = field(
+        default_factory=list
+    )
 
     # Flow + link graph
     link_from: list[ItemLink] = field(default_factory=list)  # forward references

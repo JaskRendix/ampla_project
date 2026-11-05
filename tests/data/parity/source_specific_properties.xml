@@ -1,0 +1,29 @@
+<Project>
+  <Item id="favorites" name="Favorites" type="Other">
+    <Property name="Home" valueIsXml="true">
+      <Property type="Citect.Ampla.General.Common.FavoriteDescriptor,Citect.Ampla.General.Common">
+        <Property name="Name">Home view</Property>
+        <Property name="Module">Production</Property>
+        <Property name="Location">Plant.Area</Property>
+        <Property name="LocationType">Home</Property>
+        <Property name="ViewName">Overview</Property>
+      </Property>
+    </Property>
+    <Property name="Favorites" valueIsXml="true">
+      <Property type="Citect.Ampla.General.Common.FavoriteDescriptorCollection,Citect.Ampla.General.Common">
+        <Property name="Name">My Favorites</Property>
+        <Item type="Citect.Ampla.General.Common.FavoriteDescriptor,Citect.Ampla.General.Common">
+          <Property name="Name">Pump downtime</Property>
+          <Property name="Module">Downtime</Property>
+          <Property name="Location">Plant.Area.Pump</Property>
+          <Property name="LocationType">Favorite</Property>
+          <Property name="Filter">Status=Down</Property>
+        </Item>
+      </Property>
+    </Property>
+    <Property name="MySubscription">unfinished|/Plant/Area</Property>
+  </Item>
+  <Item id="empty-favorites" name="EmptyFavorites" type="Other">
+    <Property name="Favorites" valueIsXml="true" />
+  </Item>
+</Project>

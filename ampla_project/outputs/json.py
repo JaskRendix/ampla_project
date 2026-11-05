@@ -36,7 +36,7 @@ def project_to_json(project: Project) -> dict[str, Any]:
 
 
 def _item_to_dict(item: Item) -> dict[str, Any]:
-    return {
+    result = {
         "id": item.id,
         "name": item.name,
         "type": item.type,
@@ -52,6 +52,29 @@ def _item_to_dict(item: Item) -> dict[str, Any]:
         "link_from": [_itemlink_to_dict(l) for l in item.link_from],
         "link_to": [_itemlink_to_dict(l) for l in item.link_to],
     }
+    if item.decision_matrix_inputs:
+        result["decision_matrix_inputs"] = [
+            {
+                "id": entry.id,
+                "name": entry.name,
+                "hash": entry.hash,
+                "translation": entry.translation,
+                "display_order": entry.display_order,
+                "item_link": _itemlink_to_dict(entry.item_link),
+            }
+            for entry in item.decision_matrix_inputs
+        ]
+    if item.decision_matrix_input_rules:
+        result["decision_matrix_input_rules"] = [
+            {
+                "name": entry.name,
+                "display_order": entry.display_order,
+                "value": entry.value,
+                "item_link": _itemlink_to_dict(entry.item_link),
+            }
+            for entry in item.decision_matrix_input_rules
+        ]
+    return result
 
 
 def _property_to_dict(prop: Property) -> dict[str, Any]:

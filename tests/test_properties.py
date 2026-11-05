@@ -22,7 +22,7 @@ def test_csv_property_to_itemlinks():
     assert prop.item_links[2].absolute_path == "C"
 
 
-def test_csv_property_skips_empty_segments():
+def test_csv_property_preserves_source_segments_and_whitespace():
     xml = """
     <Item id="1" name="Test" type="X">
       <Property name="EquipmentTypes">A,, C ,</Property>
@@ -33,7 +33,7 @@ def test_csv_property_skips_empty_segments():
 
     prop = normalize_property(ctx, root, root.find("Property"))
 
-    assert [link.absolute_path for link in prop.item_links] == ["A", "C"]
+    assert [link.absolute_path for link in prop.item_links] == ["A", "", " C ", ""]
 
 
 def test_soap_property_returns_placeholder_and_flag():
@@ -84,6 +84,7 @@ def test_subscription_property_ignores_invalid_lines():
     prop = normalize_property(ctx, root, root.find("Property"))
 
     assert prop.item_links == []
+    assert prop.value == "invalid-line-without-delimiters"
 
 
 def test_home_property_counts_home_favourites():
@@ -127,13 +128,29 @@ def test_favorites_property_marks_corrupt_entries():
     prop = normalize_property(ctx, root, root.find("Property"))
 
     assert prop.value == "{2 Favourite(s)}"
-    assert prop.attributes["isCorrupt"] == "true"
+    assert prop.attributes == {}
+    assert prop.extra_xml["children"][0]["attributes"]["isCorrupt"] == "true"
+
+
+def test_favorites_property_uses_source_empty_count_text():
+    xml = """
+    <Item id="1" name="Test" type="X">
+      <Property name="Favorites" />
+    </Item>
+    """
+    root = fromstring(xml)
+    ctx = NormalizationContext(root, None)
+
+    prop = normalize_property(ctx, root, root.find("Property"))
+
+    assert prop.value == "{0 Favorite(s)}"
+    assert prop.extra_xml is None
 
 
 def test_cycle_manager_property_builds_item_links():
     xml = """
     <Item id="1" name="Test" type="Citect.Ampla.General.Server.RecordStates.CycleManager">
-      <Property name="Cycles">
+      <Property name="Cycles" valueIsXml="true">
         <Property>
           <Item>cycle1</Item>
         </Property>
@@ -149,6 +166,7 @@ def test_cycle_manager_property_builds_item_links():
     prop = normalize_property(ctx, root, root.find("Property"))
 
     assert [link.absolute_path for link in prop.item_links] == ["cycle1", "cycle2"]
+    assert prop.attributes == {}
 
 
 def test_historical_expression_warning_sets_message_when_manual_and_empty_format():

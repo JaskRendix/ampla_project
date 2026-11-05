@@ -1,0 +1,52 @@
+<Project>
+  <Reference name="Citect.Ampla.StandardItems" version="4.2.0.0" />
+  <Item id="matrix" name="Matrix" type="Citect.Ampla.General.Server.DecisionMatrix">
+    <Property name="DisplayOrder">4</Property>
+    <Property name="RunState">Running</Property>
+    <Item id="input-a" name="InputA" type="Citect.Ampla.StandardItems.CalculatedVariable">
+      <Property name="DisplayOrder">7</Property>
+    </Item>
+    <Item id="input-b" name="InputB" type="Citect.Ampla.StandardItems.CalculatedVariable" />
+    <Item id="rule" name="Rule" type="Citect.Ampla.General.Server.DecisionMatrixRule">
+      <Property name="InputA">True</Property>
+      <Property name="DisplayOrderIndex">99</Property>
+      <Item id="output" name="Output" type="Citect.Ampla.StandardItems.CalculatedVariable" />
+    </Item>
+  </Item>
+  <Item id="resolver" name="Resolver" type="Citect.Ampla.Metrics.Server.Resolvers.Resolver">
+    <Property name="ResolverName">R</Property>
+  </Item>
+  <Item id="user" name="User" type="Citect.Ampla.StandardItems.User">
+    <Property name="SecurityID">sid</Property>
+  </Item>
+  <Item id="oledb-variable" name="Value" type="Citect.Ampla.Connectors.OleDbConnector.OleDbVariable">
+    <Property name="SampleTypeCode">Double</Property>
+    <Property name="DataSource">ignored</Property>
+  </Item>
+  <Item id="oledb-default" name="DefaultValue" type="Citect.Ampla.Connectors.OleDbConnector.OleDbVariable" />
+  <Item id="adapter" name="Adapter" type="Citect.Ampla.Connectors.OleDbConnector.OleDbAdapter">
+    <Property name="ConnectionString" xmlns:soap="http://schemas.xmlsoap.org/soap/envelope/">
+      <soap:Envelope>
+        <soap:Body>
+          <Server>db.example</Server>
+          <Database>plant</Database>
+        </soap:Body>
+      </soap:Envelope>
+    </Property>
+  </Item>
+  <Item id="empty-adapter" name="EmptyAdapter" type="Citect.Ampla.Connectors.OleDbConnector.OleDbAdapter">
+    <Property name="ConnectionString" xmlns:soap="http://schemas.xmlsoap.org/soap/envelope/">
+      <soap:Envelope><soap:Body /></soap:Envelope>
+    </Property>
+  </Item>
+  <Item id="ordinary" name="Ordinary" type="Other">
+    <Property name="DataSource">keep ordinary property</Property>
+    <Property name="RunState">keep ordinary runtime-looking property</Property>
+  </Item>
+  <Item id="definition-target" name="DefinitionTarget" type="Other" />
+  <Item id="defined-item" name="DefinedItem" type="Other">
+    <Property name="Definition">
+      <ItemLink absolutePath="DefinitionTarget" />
+    </Property>
+  </Item>
+</Project>

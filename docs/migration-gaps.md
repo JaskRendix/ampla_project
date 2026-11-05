@@ -13,6 +13,7 @@ Legacy **reporting, HTML, Excel, DotML, and mindmap** templates are explicitly *
 - Class normalization → `ampla_project.normalize.classes`
 - Item/property normalization → `ampla_project.normalize.items`, `ampla_project.normalize.properties`
 - Property specifics & subscriptions → `ampla_project.normalize.properties`
+- DecisionMatrix inputs/rules, source defaults, SOAP adapter fields, and Favorites structures
 - Link resolution (LinkFrom/LinkTo) → `ampla_project.normalize.links`
 - Expression formatting / `ExpressionConfig` → `ampla_project.normalize.expressions`
 - Flow graph creation → `ampla_project.normalize.flow`

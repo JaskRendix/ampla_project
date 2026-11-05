@@ -2,7 +2,13 @@ from __future__ import annotations
 
 from lxml.etree import Element
 
-from ..model.item import Item, Property
+from ..model.item import (
+    DecisionMatrixInput,
+    DecisionMatrixInputRule,
+    Item,
+    ItemLink,
+    Property,
+)
 from .classes import resolve_class_association
 from .context import NormalizationContext
 from .properties import normalize_property
@@ -63,6 +69,9 @@ def build_item(ctx: NormalizationContext, elem: Element) -> Item:
         if prop:
             item.properties[prop.name] = prop
 
+    _add_source_defaults(item)
+    _add_decision_matrix_data(ctx, elem, item)
+
     # Add default DisplayOrder if missing
     if "DisplayOrder" not in item.properties:
         item.properties["DisplayOrder"] = Property(
@@ -81,6 +90,86 @@ def build_item(ctx: NormalizationContext, elem: Element) -> Item:
         item.children.append(child)
 
     return item
+
+
+def _add_source_defaults(item: Item) -> None:
+    defaults = {
+        "Citect.Ampla.Metrics.Server.Resolvers.Resolver": {
+            "Action": "Module",
+            "ResolverOperation": "Sum",
+        },
+        "Citect.Ampla.StandardItems.User": {"Authentication": "WindowsIntegrated"},
+        "Citect.Ampla.Connectors.OleDbConnector.OleDbVariable": {
+            "SampleTypeCode": "Single"
+        },
+    }
+    for name, value in defaults.get(item.type, {}).items():
+        if name not in item.properties:
+            item.properties[name] = Property(
+                name=name, value=value, attributes={}, item_links=[]
+            )
+
+
+def _add_decision_matrix_data(
+    ctx: NormalizationContext, elem: Element, item: Item
+) -> None:
+    matrix_type = "Citect.Ampla.General.Server.DecisionMatrix"
+    rule_type = "Citect.Ampla.General.Server.DecisionMatrixRule"
+    variable_type = "Citect.Ampla.StandardItems.CalculatedVariable"
+
+    def display_order(variable: Element) -> str:
+        order = variable.find("Property[@name='DisplayOrder']")
+        return (
+            (order.text or "").strip()
+            if order is not None
+            else str(ctx.default_display_order)
+        )
+
+    if item.type == matrix_type:
+        for variable in elem.findall(f"Item[@type='{variable_type}']"):
+            variable_id = variable.get("id")
+            variable_name = variable.get("name")
+            if not variable_id or not variable_name:
+                continue
+            full_name = ".".join((item.full_name, variable_name))
+            item.decision_matrix_inputs.append(
+                DecisionMatrixInput(
+                    id=variable_id,
+                    name=variable_name,
+                    hash=ctx.generate_hash(full_name),
+                    translation=ctx.get_translation(variable_name),
+                    display_order=display_order(variable),
+                    item_link=ItemLink(
+                        target_id=variable_id,
+                        absolute_path=full_name,
+                    ),
+                )
+            )
+    elif item.type == rule_type:
+        parent = elem.getparent()
+        if parent is None:
+            return
+        for variable in parent.findall(f"Item[@type='{variable_type}']"):
+            variable_name = variable.get("name")
+            variable_id = variable.get("id")
+            if not variable_name or not variable_id:
+                continue
+            rule_value = elem.find(f"Property[@name='{variable_name}']")
+            item.decision_matrix_input_rules.append(
+                DecisionMatrixInputRule(
+                    name=variable_name,
+                    display_order=display_order(variable),
+                    value=(
+                        (rule_value.text or "").strip()
+                        if rule_value is not None
+                        else "Ignore"
+                    ),
+                    item_link=ItemLink(
+                        target_id=variable_id,
+                        absolute_path=compute_full_name(variable),
+                    ),
+                )
+            )
 
 
 def compute_full_name(elem: Element) -> str:

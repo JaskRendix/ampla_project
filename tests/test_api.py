@@ -160,3 +160,32 @@ def test_classes_api_preserves_inheritance_and_associations():
         ]["target_id"]
         == "derived"
     )
+
+
+def test_api_exposes_source_specific_item_normalization():
+    path = str(Path("tests/data/parity/source_specific_items.xml").resolve())
+    response = client.get("/project", params={"path": path})
+
+    assert response.status_code == 200
+    data = response.json()
+    assert [
+        entry["name"] for entry in data["items"]["matrix"]["decision_matrix_inputs"]
+    ] == [
+        "InputA",
+        "InputB",
+    ]
+    assert data["items"]["resolver"]["properties"]["Action"]["value"] == "Module"
+    assert (
+        data["items"]["adapter"]["properties"]["ConnectionString"]["extra_xml"][
+            "children"
+        ][0]["tag"]
+        == "soap-property"
+    )
+    item_response = client.get("/items/matrix", params={"path": path})
+    assert item_response.status_code == 200
+    assert [
+        entry["name"] for entry in item_response.json()["decision_matrix_inputs"]
+    ] == [
+        "InputA",
+        "InputB",
+    ]

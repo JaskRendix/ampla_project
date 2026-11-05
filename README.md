@@ -27,6 +27,7 @@ Legacy HTML, Excel, DotML, metrics, and inventory exports are not included.
 - LinkFrom and LinkTo graph construction from nested `ItemLink` XML
 - expression reference resolution  
 - security model extraction  
+- source-specific DecisionMatrix, resolver, user, OLE DB, and Favorites normalization
 - preservation of nested property XML in JSON
 - test suite for core modules  
 

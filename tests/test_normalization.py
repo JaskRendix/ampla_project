@@ -149,3 +149,206 @@ def test_nested_property_links_match_parity_fixture_and_serialize():
         )
     ]
     assert serialized_inputs["extra_xml"] == expected["preserved_inputs_xml"]
+
+
+def test_source_specific_item_transforms_match_parity_fixture():
+    project = normalize(load_xml(Path("tests/data/parity/source_specific_items.xml")))
+
+    matrix = project.items["matrix"]
+    assert "RunState" not in matrix.properties
+    assert [entry.name for entry in matrix.decision_matrix_inputs] == [
+        "InputA",
+        "InputB",
+    ]
+    assert [
+        (
+            entry.item_link.target_id,
+            entry.item_link.absolute_path,
+            entry.display_order,
+        )
+        for entry in matrix.decision_matrix_inputs
+    ] == [
+        ("input-a", "Matrix.InputA", "7"),
+        ("input-b", "Matrix.InputB", "50000"),
+    ]
+
+    rule = project.items["rule"]
+    assert "DisplayOrderIndex" not in rule.properties
+    assert [
+        (
+            entry.name,
+            entry.value,
+            entry.display_order,
+            entry.item_link.target_id,
+        )
+        for entry in rule.decision_matrix_input_rules
+    ] == [
+        ("InputA", "True", "7", "input-a"),
+        ("InputB", "Ignore", "50000", "input-b"),
+    ]
+    assert rule.properties["DisplayOrder"].value == "50000"
+
+    assert project.items["resolver"].properties["Action"].value == "Module"
+    assert project.items["resolver"].properties["ResolverOperation"].value == "Sum"
+    assert project.items["user"].properties["Authentication"].value == (
+        "WindowsIntegrated"
+    )
+    assert project.security["users"]["user"].authentication == "WindowsIntegrated"
+    assert (
+        project.items["oledb-variable"].properties["SampleTypeCode"].value == "Double"
+    )
+    assert project.items["oledb-default"].properties["SampleTypeCode"].value == "Single"
+    assert "DataSource" not in project.items["oledb-variable"].properties
+    assert "DataSource" not in project.items["ordinary"].properties
+    assert "RunState" not in project.items["ordinary"].properties
+    assert "Definition" not in project.items["defined-item"].properties
+    assert project.items["defined-item"].definition == "DefinitionTarget"
+
+    adapter_property = project.items["adapter"].properties["ConnectionString"]
+    assert adapter_property.value is None
+    assert adapter_property.attributes == {"isSoap": "true"}
+    assert adapter_property.extra_xml["children"] == [
+        {
+            "tag": "soap-property",
+            "attributes": {"name": "Server"},
+            "text": "db.example",
+            "tail": None,
+            "children": [],
+        },
+        {
+            "tag": "soap-property",
+            "attributes": {"name": "Database"},
+            "text": "plant",
+            "tail": None,
+            "children": [],
+        },
+    ]
+
+    empty_soap = project.items["empty-adapter"].properties["ConnectionString"]
+    assert empty_soap.value == "{SOAP}"
+
+
+def test_source_specific_items_serialize_without_changing_existing_fields():
+    project = normalize(load_xml(Path("tests/data/parity/source_specific_items.xml")))
+    data = project_to_json(project)
+    matrix = data["items"]["matrix"]
+
+    assert matrix["decision_matrix_inputs"] == [
+        {
+            "id": "input-a",
+            "name": "InputA",
+            "hash": project.items["input-a"].hash,
+            "translation": None,
+            "display_order": "7",
+            "item_link": {
+                "target_id": "input-a",
+                "absolute_path": "Matrix.InputA",
+                "property_name": None,
+                "broken_target": False,
+                "broken_absolute": False,
+                "broken_relative": False,
+                "event": None,
+                "handler": None,
+                "expression_match": None,
+                "relative_path": None,
+            },
+        },
+        {
+            "id": "input-b",
+            "name": "InputB",
+            "hash": project.items["input-b"].hash,
+            "translation": None,
+            "display_order": "50000",
+            "item_link": {
+                "target_id": "input-b",
+                "absolute_path": "Matrix.InputB",
+                "property_name": None,
+                "broken_target": False,
+                "broken_absolute": False,
+                "broken_relative": False,
+                "event": None,
+                "handler": None,
+                "expression_match": None,
+                "relative_path": None,
+            },
+        },
+    ]
+    assert data["items"]["rule"]["decision_matrix_input_rules"][0] == {
+        "name": "InputA",
+        "display_order": "7",
+        "value": "True",
+        "item_link": {
+            "target_id": "input-a",
+            "absolute_path": "Matrix.InputA",
+            "property_name": None,
+            "broken_target": False,
+            "broken_absolute": False,
+            "broken_relative": False,
+            "event": None,
+            "handler": None,
+            "expression_match": None,
+            "relative_path": None,
+        },
+    }
+    assert (
+        data["items"]["adapter"]["properties"]["ConnectionString"]["extra_xml"][
+            "children"
+        ][0]["tag"]
+        == "soap-property"
+    )
+
+
+def test_favorite_and_subscription_property_transforms_match_source_shape():
+    project = normalize(
+        load_xml(Path("tests/data/parity/source_specific_properties.xml"))
+    )
+    properties = project.items["favorites"].properties
+
+    assert properties["Home"].value == "{1 Favourite(s)}"
+    assert properties["Home"].attributes == {}
+    assert properties["Home"].extra_xml["children"][1] == {
+        "tag": "Favorite",
+        "attributes": {
+            "name": "Home view",
+            "module": "Production",
+            "location": "Plant.Area",
+            "view": "Overview",
+        },
+        "text": None,
+        "tail": None,
+        "children": [],
+    }
+
+    favorites = properties["Favorites"]
+    assert favorites.value == "{1 Favourite(s)}"
+    assert favorites.attributes == {}
+    assert favorites.extra_xml["children"][1] == {
+        "tag": "Favorites",
+        "attributes": {"name": "My Favorites"},
+        "text": None,
+        "tail": None,
+        "children": [
+            {
+                "tag": "Favorite",
+                "attributes": {
+                    "name": "Pump downtime",
+                    "module": "Downtime",
+                    "filter": "Status=Down",
+                    "location": "Plant.Area.Pump",
+                },
+                "text": None,
+                "tail": None,
+                "children": [],
+            }
+        ],
+    }
+    assert project.items["empty-favorites"].properties["Favorites"].value == (
+        "{0 Favorite(s)}"
+    )
+    assert properties["MySubscription"].value == "unfinished|/Plant/Area"
+    assert properties["MySubscription"].item_links == []
+    serialized = project_to_json(project)
+    assert (
+        serialized["items"]["favorites"]["properties"]["Favorites"]["extra_xml"]
+        == favorites.extra_xml
+    )
