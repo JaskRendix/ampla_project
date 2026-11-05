@@ -3,7 +3,7 @@ from __future__ import annotations
 from typing import Any
 
 from ..model.item import Item, ItemLink, Property
-from ..model.project import Project
+from ..model.project import ExpressionModel, Project
 from ..model.security import (
     SecurityMember,
     SecurityOperation,
@@ -41,7 +41,7 @@ def project_to_json(project: Project) -> dict[str, Any]:
             for role_id, role in project.security["role_definitions"].items()
         }
 
-    return {
+    result = {
         "items": {
             item_id: _item_to_dict(item) for item_id, item in project.items.items()
         },
@@ -53,6 +53,58 @@ def project_to_json(project: Project) -> dict[str, Any]:
         "platform_version": project.platform_version,
         "applications_version": project.applications_version,
         "properties": project.properties,
+    }
+    if project.expression_model is not None:
+        result["expression_model"] = _expression_model_to_dict(project.expression_model)
+    return result
+
+
+def _expression_model_to_dict(model: ExpressionModel) -> dict[str, Any]:
+    return {
+        "expression_item_ids": model.expression_item_ids,
+        "source_item_ids": model.source_item_ids,
+        "dependencies": [
+            {
+                "expression_item_id": dependency.expression_item_id,
+                "expression_property_name": dependency.expression_property_name,
+                "target_item_id": dependency.target_item_id,
+                "target_full_name": dependency.target_full_name,
+                "property_name": dependency.property_name,
+                "dependency_type": dependency.dependency_type,
+                "resolved": dependency.resolved,
+            }
+            for dependency in model.dependencies
+        ],
+        "references": [
+            {
+                "expression_item_id": reference.expression_item_id,
+                "property_name": reference.property_name,
+                "target_item_id": reference.target_item_id,
+                "absolute_path": reference.absolute_path,
+                "format": reference.format,
+                "expression_format": reference.expression_format,
+                "resolved": reference.resolved,
+            }
+            for reference in model.references
+        ],
+        "streams": [
+            {
+                "item_id": stream.item_id,
+                "name": stream.name,
+                "data_type": stream.data_type,
+                "property_links": [
+                    {
+                        "expression_item_id": link.expression_item_id,
+                        "property_name": link.property_name,
+                        "expression_type": link.expression_type,
+                        "expression_full_name": link.expression_full_name,
+                        "dependency_type": link.dependency_type,
+                    }
+                    for link in stream.property_links
+                ],
+            }
+            for stream in model.streams
+        ],
     }
 
 

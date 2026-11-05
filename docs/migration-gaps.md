@@ -17,6 +17,8 @@ Legacy **reporting, HTML, Excel, DotML, and mindmap** templates are explicitly *
 - DecisionMatrix inputs/rules, source defaults, SOAP adapter fields, and Favorites structures
 - Link resolution (LinkFrom/LinkTo) → `ampla_project.normalize.links`
 - Expression formatting / `ExpressionConfig` → `ampla_project.normalize.expressions`
+- Expression dependencies, source-item relationships, declared streams, and stream
+  property links → `ampla_project.normalize.expression_model`
 - Flow graph creation → `ampla_project.normalize.flow`
 - Security extraction → `ampla_project.normalize.security`
 - Context, translations, version extraction → `ampla_project.normalize.context`
@@ -52,7 +54,10 @@ Legacy **reporting, HTML, Excel, DotML, and mindmap** templates are explicitly *
 # 3. Expressions (In Scope)
 
 ## ✔ Implemented
-- Expression normalization (`Project.Expressions.xslt` equivalent)
+- Expression dependency extraction and source-item relationships
+- Declared-stream selection and expression property links
+- Expression reference and dependency serialization, including unresolved targets
+- Expression formatting / `ExpressionConfig` fallback behavior
 
 ## ❗ Missing
 - None (normalization layer complete)

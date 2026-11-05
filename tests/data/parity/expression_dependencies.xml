@@ -1,0 +1,73 @@
+<Project>
+  <Reference name="Example">
+    <Type name="Example.Calculated">
+      <Property name="DisplayName" />
+      <Stream name="Samples" dataType="Double" />
+      <Stream name="Events" dataType="Event" />
+    </Type>
+    <Type name="Example.Source">
+      <Stream name="Samples" dataType="Int32" />
+    </Type>
+  </Reference>
+  <Item id="area" name="Area" type="Example.Folder">
+    <Item id="source-a" name="SourceA" type="Example.Source">
+      <Property name="HistoricalFieldExpression" valueIsXml="true">
+        <HistoricalExpressionConfig>
+          <ExpressionConfig format="#ItemReference0#">
+            <ItemLinkCollection>
+              <ItemLink targetID="source-b" propertyName="Samples" />
+            </ItemLinkCollection>
+          </ExpressionConfig>
+          <DependencyCollection>
+            <Dependency dependencyType="Trigger">
+              <ItemPropertyLink propertyName="Samples">
+                <ItemLink
+                  targetID="source-b"
+                  absolutePath="Area.SourceA.SourceB"
+                />
+              </ItemPropertyLink>
+            </Dependency>
+          </DependencyCollection>
+        </HistoricalExpressionConfig>
+      </Property>
+      <Item id="source-b" name="SourceB" type="Example.Source" />
+    </Item>
+    <Item id="calculated" name="Calculated" type="Example.Calculated">
+      <Property name="Formula" valueIsXml="true">
+        <FormulaConfig>
+          <ExpressionConfig format="sum(#ItemReference0# + #ItemReference1#)">
+            <ItemLinkCollection>
+              <ItemLink targetID="source-a" format="value(#ItemReference0#)" />
+              <ItemLink
+                targetID="missing-item"
+                absolutePath="Area.Missing"
+                format="missing(#ItemReference0#)"
+              >
+                <ItemLinkCollection>
+                  <ItemLink targetID="source-b" format="nested(#ItemReference0#)" />
+                </ItemLinkCollection>
+              </ItemLink>
+            </ItemLinkCollection>
+          </ExpressionConfig>
+          <DependencyCollection>
+            <Dependency dependencyType="Input">
+              <ItemPropertyLink propertyName="Samples">
+                <ItemLink targetID="source-a" absolutePath="Area.SourceA" />
+              </ItemPropertyLink>
+            </Dependency>
+            <Dependency dependencyType="Historical">
+              <ItemPropertyLink propertyName="Events">
+                <ItemLink targetID="source-a" absolutePath="Area.SourceA" />
+              </ItemPropertyLink>
+            </Dependency>
+            <Dependency dependencyType="Missing">
+              <ItemPropertyLink propertyName="UnknownStream">
+                <ItemLink targetID="missing-item" absolutePath="Area.Missing" />
+              </ItemPropertyLink>
+            </Dependency>
+          </DependencyCollection>
+        </FormulaConfig>
+      </Property>
+    </Item>
+  </Item>
+</Project>

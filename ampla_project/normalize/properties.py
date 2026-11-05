@@ -68,7 +68,7 @@ def normalize_property(
         return _normalize_historical_expression(item_elem, prop_elem, name, attrs)
 
     # 7. ExpressionConfig normalization
-    if prop_elem.find("HistoricalExpressionConfig/ExpressionConfig") is not None:
+    if prop_elem.find(".//ExpressionConfig") is not None:
         return _normalize_expression_config_property(ctx, prop_elem, name, attrs)
 
     # 8. Preserve nested XML and extract ordinary property links.

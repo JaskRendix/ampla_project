@@ -195,7 +195,7 @@ def test_resolve_item_links_marks_broken_absolute_and_broken_target():
     assert item_a.properties["BrokenTarget"].item_links[0].broken_target is True
 
 
-def test_expression_config_with_missing_targetid_keeps_placeholder(context_factory):
+def test_expression_config_with_missing_targetid_uses_empty_fallback(context_factory):
     xml = """
     <Project>
       <Item id='A' name='A' type='Test'>
@@ -218,9 +218,9 @@ def test_expression_config_with_missing_targetid_keeps_placeholder(context_facto
     normalize_expression_config(ctx, prop)
 
     expr = prop.find(".//ExpressionConfig")
-    assert expr.get("text") == "sum(#ItemReference0#)"
+    assert expr.get("text") == "sum()"
     link = expr.find(".//ItemLink")
-    assert link.get("expressionFormat") == "val(#ItemReference0#)"
+    assert link.get("expressionFormat") == "val()"
 
 
 def test_expression_config_with_missing_item_target_inserts_missing_marker(
@@ -248,9 +248,9 @@ def test_expression_config_with_missing_item_target_inserts_missing_marker(
     normalize_expression_config(ctx, prop)
 
     expr = prop.find(".//ExpressionConfig")
-    assert expr.get("text") == "sum(Project.[Missing:MissingItem])"
+    assert expr.get("text") == "sum()"
     link = expr.find(".//ItemLink")
-    assert link.get("expressionFormat") == "val(Project.[Missing:MissingItem])"
+    assert link.get("expressionFormat") == "val()"
 
 
 def test_resolve_class_association_marks_unknown_class_as_broken_target(

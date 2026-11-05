@@ -224,3 +224,15 @@ def test_project_api_accepts_optional_translation_language():
         "Pompe centrifuge"
     )
     assert data["classes"]["base"]["translation"] == "Classe de base"
+
+
+def test_project_api_exposes_expression_dependency_model():
+    path = str(Path("tests/data/parity/expression_dependencies.xml").resolve())
+    response = client.get("/project", params={"path": path})
+
+    assert response.status_code == 200
+    expression_model = response.json()["expression_model"]
+    assert expression_model["expression_item_ids"] == ["source-a", "calculated"]
+    assert expression_model["source_item_ids"] == ["source-a", "source-b"]
+    assert expression_model["dependencies"][3]["resolved"] is False
+    assert expression_model["streams"][0]["item_id"] == "source-a"

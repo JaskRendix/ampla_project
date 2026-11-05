@@ -25,7 +25,8 @@ All **HTML, Excel, DotML, mindmap, and reporting templates** are explicitly **ou
 |------|---------|------------------|
 | `Document.Hierarchy.xslt` | Item hierarchy | `normalize.items` |
 | `Document.Interfaces.xslt` | Class/interface definitions | `normalize.classes` |
-| `Project.Expressions.xslt` | Expression normalization | `normalize.expressions` |
+| `Project.Expressions.xslt` | Expression dependency/source/stream model | `normalize.expression_model` |
+| `Project.Normalize.xslt` (ExpressionConfig templates) | Expression formatting and reference resolution | `normalize.expressions` |
 
 ---
 
@@ -63,8 +64,8 @@ All **HTML, Excel, DotML, mindmap, and reporting templates** are explicitly **ou
 
 | XSLT | Purpose | Python Equivalent |
 |------|---------|------------------|
-| `Document.Expressions.DotML.xslt` | Expression parsing | `normalize.expressions` |
-| `Excel.Expressions.xslt` | Expression export | `outputs.json` (partial) |
+| `Document.Expressions.DotML.xslt` | Expression visualization/export | Out of scope |
+| `Excel.Expressions.xslt` | Expression export | Out of scope |
 
 ---
 

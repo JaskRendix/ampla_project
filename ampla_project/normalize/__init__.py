@@ -5,6 +5,7 @@ from lxml.etree import Element
 from ..model.project import Project
 from .classes import normalize_classes
 from .context import NormalizationContext
+from .expression_model import build_expression_model
 from .flow import build_flow_graph
 from .items import normalize_items
 from .links import build_link_from_to, resolve_item_links
@@ -42,6 +43,8 @@ def normalize(
 
     build_link_from_to(ctx, items)
 
+    expression_model = build_expression_model(ctx)
+
     flow_graph = build_flow_graph(ctx, items)
 
     security = normalize_security(ctx, items, authstore_doc)
@@ -54,6 +57,7 @@ def normalize(
         flow_graph=flow_graph,
         security=security,
         metrics=metrics,
+        expression_model=expression_model,
         platform_version=_get_platform_version(root),
         applications_version=_get_applications_version(root),
         properties=_extract_project_properties(root),

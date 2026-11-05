@@ -55,11 +55,7 @@ def _format_expression(
 
     for index, link in enumerate(item_links):
         placeholder = f"#ItemReference{index}#"
-        target_id = link.get("targetID")
-
-        if not target_id:
-            continue
-
+        target_id = link.get("targetID") or link.get("targetId") or ""
         full = _get_project_full_name(ctx, target_id)
         result = result.replace(placeholder, full)
 
@@ -70,12 +66,12 @@ def _get_project_full_name(ctx: NormalizationContext, item_id: str) -> str:
     """
     Equivalent to XSLT getProjectFullName:
         Project.[Area].[Equipment].[Variable]
-    Adds brackets around names containing non-ASCII characters.
+    Brackets names containing characters outside ASCII letters.
     """
 
     elem = ctx.items_by_id.get(item_id)
     if elem is None:
-        return f"Project.[Missing:{item_id}]"
+        return ""
 
     names = []
     for ancestor in elem.iterancestors(tag="Item"):
@@ -91,6 +87,8 @@ def _get_project_full_name(ctx: NormalizationContext, item_id: str) -> str:
 def _bracket_if_non_ascii(name: str | None) -> str:
     if not name:
         return ""
-    if any(ord(c) > 127 for c in name):
+    if any(
+        not ("A" <= character <= "Z" or "a" <= character <= "z") for character in name
+    ):
         return f"[{name}]"
     return name

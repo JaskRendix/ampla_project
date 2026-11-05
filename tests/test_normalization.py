@@ -109,6 +109,144 @@ def test_translation_serialization_is_additive_and_language_specific():
     assert french_data["classes"]["base"]["translation"] == "Classe de base"
 
 
+def test_expression_dependency_model_tracks_chains_streams_and_missing_targets():
+    project = normalize(load_xml(Path("tests/data/parity/expression_dependencies.xml")))
+
+    expression_model = project.expression_model
+    assert expression_model is not None
+    assert expression_model.expression_item_ids == ["source-a", "calculated"]
+    assert expression_model.source_item_ids == ["source-a", "source-b"]
+    assert [
+        (
+            dependency.expression_item_id,
+            dependency.expression_property_name,
+            dependency.target_item_id,
+            dependency.target_full_name,
+            dependency.property_name,
+            dependency.dependency_type,
+            dependency.resolved,
+        )
+        for dependency in expression_model.dependencies
+    ] == [
+        (
+            "source-a",
+            "HistoricalFieldExpression",
+            "source-b",
+            "Area.SourceA.SourceB",
+            "Samples",
+            "Trigger",
+            True,
+        ),
+        (
+            "calculated",
+            "Formula",
+            "source-a",
+            "Area.SourceA",
+            "Samples",
+            "Input",
+            True,
+        ),
+        (
+            "calculated",
+            "Formula",
+            "source-a",
+            "Area.SourceA",
+            "Events",
+            "Historical",
+            True,
+        ),
+        (
+            "calculated",
+            "Formula",
+            "missing-item",
+            "Area.Missing",
+            "UnknownStream",
+            "Missing",
+            False,
+        ),
+    ]
+    assert [
+        (
+            stream.item_id,
+            stream.name,
+            stream.data_type,
+            [
+                (link.expression_item_id, link.property_name, link.dependency_type)
+                for link in stream.property_links
+            ],
+        )
+        for stream in expression_model.streams
+    ] == [
+        (
+            "source-a",
+            "Samples",
+            "Int32",
+            [("calculated", "Formula", "Input")],
+        ),
+        (
+            "source-b",
+            "Samples",
+            "Int32",
+            [("source-a", "HistoricalFieldExpression", "Trigger")],
+        ),
+    ]
+    assert expression_model.references[0].target_item_id == "source-b"
+    assert expression_model.references[0].resolved
+    assert expression_model.references[2].target_item_id == "missing-item"
+    assert not expression_model.references[2].resolved
+    assert expression_model.references[2].absolute_path == "Area.Missing"
+    assert expression_model.references[2].expression_format == (
+        "missing(Project.Area.SourceA)"
+    )
+    expression_xml = project.items["calculated"].properties["Formula"].extra_xml
+    assert expression_xml["children"][0]["children"][0]["attributes"]["text"] == (
+        "sum(Project.Area.SourceA + )"
+    )
+    nested_links = expression_xml["children"][0]["children"][0]["children"][0][
+        "children"
+    ][1]["children"][0]["children"]
+    assert nested_links[0]["attributes"]["targetID"] == "source-b"
+    assert (
+        project.items["calculated"]
+        .properties["Formula"]
+        .extra_xml["children"][0]["tag"]
+        == "FormulaConfig"
+    )
+
+
+def test_expression_dependency_serialization_is_additive():
+    project = normalize(load_xml(Path("tests/data/parity/expression_dependencies.xml")))
+    serialized = project_to_json(project)
+    model = serialized["expression_model"]
+
+    assert model["expression_item_ids"] == ["source-a", "calculated"]
+    assert model["dependencies"][3] == {
+        "expression_item_id": "calculated",
+        "expression_property_name": "Formula",
+        "target_item_id": "missing-item",
+        "target_full_name": "Area.Missing",
+        "property_name": "UnknownStream",
+        "dependency_type": "Missing",
+        "resolved": False,
+    }
+    assert model["streams"][0]["property_links"][0] == {
+        "expression_item_id": "calculated",
+        "property_name": "Formula",
+        "expression_type": "Example.Calculated",
+        "expression_full_name": "Area.Calculated",
+        "dependency_type": "Input",
+    }
+    property_xml = serialized["items"]["calculated"]["properties"]["Formula"][
+        "extra_xml"
+    ]
+    assert (
+        property_xml["children"][0]["children"][0]["children"][0]["children"][1][
+            "children"
+        ][0]["children"][0]["attributes"]["targetID"]
+        == "source-b"
+    )
+
+
 def test_normalize_extracts_project_attributes_and_versions():
     xml = """
     <Project id="p" name="Project">

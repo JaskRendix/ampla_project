@@ -6,6 +6,54 @@ from .item import Item
 
 
 @dataclass
+class ExpressionDependency:
+    expression_item_id: str
+    expression_property_name: str
+    target_item_id: str | None
+    target_full_name: str | None
+    property_name: str | None
+    dependency_type: str | None
+    resolved: bool
+
+
+@dataclass
+class ExpressionReference:
+    expression_item_id: str
+    property_name: str
+    target_item_id: str | None
+    absolute_path: str | None
+    format: str | None
+    expression_format: str | None
+    resolved: bool
+
+
+@dataclass
+class ExpressionPropertyLink:
+    expression_item_id: str
+    property_name: str
+    expression_type: str
+    expression_full_name: str
+    dependency_type: str | None
+
+
+@dataclass
+class ExpressionStream:
+    item_id: str
+    name: str
+    data_type: str | None
+    property_links: list[ExpressionPropertyLink] = field(default_factory=list)
+
+
+@dataclass
+class ExpressionModel:
+    expression_item_ids: list[str] = field(default_factory=list)
+    source_item_ids: list[str] = field(default_factory=list)
+    dependencies: list[ExpressionDependency] = field(default_factory=list)
+    references: list[ExpressionReference] = field(default_factory=list)
+    streams: list[ExpressionStream] = field(default_factory=list)
+
+
+@dataclass
 class ProjectMetrics:
     """Calculated statistics for the project."""
 
@@ -52,6 +100,7 @@ class Project:
     properties: dict[str, str]  # raw project-level attributes
 
     metrics: ProjectMetrics = field(default_factory=ProjectMetrics)
+    expression_model: ExpressionModel | None = None
 
     def get_item(self, item_id: str) -> Item | None:
         return self.items.get(item_id)

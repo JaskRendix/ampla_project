@@ -211,8 +211,5 @@ def test_expression_config_property_applies_normalization():
     normalize_property(ctx, root, root.find("Property"))
     expr = root.find(".//ExpressionConfig")
 
-    assert expr.get("text") == "sum(Project.[Missing:Missing])"
-    assert (
-        expr.find(".//ItemLink").get("expressionFormat")
-        == "val(Project.[Missing:Missing])"
-    )
+    assert expr.get("text") == "sum()"
+    assert expr.find(".//ItemLink").get("expressionFormat") == "val()"
