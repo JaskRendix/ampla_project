@@ -13,7 +13,9 @@ venv/
 *.egg-info/
 dist/
 build/
-src/
+src/Library/
+src/Build/
+src/External/
 
 # Pytest cache
 .coverage
