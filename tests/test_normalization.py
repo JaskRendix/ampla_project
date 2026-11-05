@@ -197,7 +197,7 @@ def test_expression_dependency_model_tracks_chains_streams_and_missing_targets()
     assert not expression_model.references[2].resolved
     assert expression_model.references[2].absolute_path == "Area.Missing"
     assert expression_model.references[2].expression_format == (
-        "missing(Project.Area.SourceA)"
+        "missing(Project.Area.SourceA.SourceB)"
     )
     expression_xml = project.items["calculated"].properties["Formula"].extra_xml
     assert expression_xml["children"][0]["children"][0]["attributes"]["text"] == (
@@ -246,6 +246,75 @@ def test_expression_dependency_serialization_is_additive():
         ][0]["children"][0]["attributes"]["targetID"]
         == "source-b"
     )
+
+
+def test_nested_expression_references_are_formatted_recursively_and_serialized():
+    project = normalize(
+        load_xml(Path("tests/data/parity/nested_expression_references.xml"))
+    )
+    serialized = project_to_json(project)
+    property_xml = serialized["items"]["calculated"]["properties"]["Formula"][
+        "extra_xml"
+    ]
+    expression = property_xml["children"][0]["children"][0]
+    top_links = expression["children"][0]["children"]
+
+    assert expression["attributes"]["text"] == ("combine(Project.Area.[Source A],)")
+    assert top_links[0]["attributes"]["expressionFormat"] == (
+        "outer(Project.Area.SourceB)"
+    )
+    assert top_links[1]["attributes"]["expressionFormat"] == (
+        "unresolved(Project.Area.SourceB)"
+    )
+
+    first_nested = top_links[0]["children"][0]["children"][0]
+    second_nested = first_nested["children"][0]["children"][0]
+    assert first_nested["attributes"]["expressionFormat"] == (
+        "middle(Project.Area.[Source C])"
+    )
+    assert second_nested["attributes"]["expressionFormat"] == "leaf(#ItemReference0#)"
+
+    from lxml.etree import XSLT, parse
+
+    source_transform = XSLT(parse("src/StyleSheets/Project.Normalize.xslt"))
+    source_normalized = source_transform(
+        parse("tests/data/parity/nested_expression_references.xml")
+    )
+    source_expression = source_normalized.xpath(
+        "//Item[@id='calculated']/Property[@name='Formula']/FormulaConfig/ExpressionConfig"
+    )[0]
+    source_top_links = source_expression.xpath("ItemLinkCollection/ItemLink")
+    assert source_expression.get("text") == expression["attributes"]["text"]
+    assert source_top_links[0].get("expressionFormat") == (
+        top_links[0]["attributes"]["expressionFormat"]
+    )
+    assert source_top_links[1].get("expressionFormat") == (
+        top_links[1]["attributes"]["expressionFormat"]
+    )
+
+
+def test_nested_expression_reference_serialization_keeps_nested_xml_structure():
+    project = normalize(
+        load_xml(Path("tests/data/parity/nested_expression_references.xml"))
+    )
+    serialized = project_to_json(project)
+
+    expression = serialized["items"]["calculated"]["properties"]["Formula"][
+        "extra_xml"
+    ]["children"][0]["children"][0]
+    first_link = expression["children"][0]["children"][0]
+    assert first_link["attributes"]["expressionFormat"] == (
+        "outer(Project.Area.SourceB)"
+    )
+    middle_link = first_link["children"][0]["children"][0]
+    assert middle_link["attributes"]["expressionFormat"] == (
+        "middle(Project.Area.[Source C])"
+    )
+    assert middle_link["children"][0]["children"][0]["attributes"] == {
+        "targetID": "source-c",
+        "format": "leaf(#ItemReference0#)",
+        "expressionFormat": "leaf(#ItemReference0#)",
+    }
 
 
 def test_normalize_extracts_project_attributes_and_versions():

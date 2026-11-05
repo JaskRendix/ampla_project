@@ -1,0 +1,35 @@
+<Project>
+  <Item id="area" name="Area" type="Folder">
+    <Item id="source-a" name="Source A" type="Example.Source" />
+    <Item id="source-b" name="SourceB" type="Example.Source" />
+    <Item id="source-c" name="Source C" type="Example.Source" />
+    <Item id="calculated" name="Calculated" type="Example.Calculated">
+      <Property name="Formula" valueIsXml="true">
+        <FormulaConfig>
+          <ExpressionConfig format="combine(#ItemReference0#,#ItemReference1#)">
+            <ItemLinkCollection>
+              <ItemLink targetID="source-a" format="outer(#ItemReference0#)">
+                <ItemLinkCollection>
+                  <ItemLink targetID="source-b" format="middle(#ItemReference0#)">
+                    <ItemLinkCollection>
+                      <ItemLink targetID="source-c" format="leaf(#ItemReference0#)" />
+                    </ItemLinkCollection>
+                  </ItemLink>
+                </ItemLinkCollection>
+              </ItemLink>
+              <ItemLink
+                targetID="missing-item"
+                absolutePath="Area.Missing"
+                format="unresolved(#ItemReference0#)"
+              >
+                <ItemLinkCollection>
+                  <ItemLink targetID="source-b" format="nested(#ItemReference0#)" />
+                </ItemLinkCollection>
+              </ItemLink>
+            </ItemLinkCollection>
+          </ExpressionConfig>
+        </FormulaConfig>
+      </Property>
+    </Item>
+  </Item>
+</Project>
