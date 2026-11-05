@@ -25,12 +25,14 @@ class NormalizationContext:
     items_by_type: dict[str, list[Element]] = field(default_factory=dict)
     items_by_reference: dict[str, list[Element]] = field(default_factory=dict)
     classes_by_id: dict[str, Element] = field(default_factory=dict)
+    types_with_display_name: set[str] = field(default_factory=set)
 
     def __post_init__(self):
         self._compute_default_display_order()
         self._load_translations()
         self._index_items()
         self._index_classes()
+        self._index_display_name_types()
 
     def _compute_default_display_order(self):
         """
@@ -65,8 +67,8 @@ class NormalizationContext:
 
         for div in self.language_doc.findall(".//div[@id]"):
             key = div.get("id")
-            value = (div.text or "").strip()
-            if key and value:
+            value = " ".join("".join(div.itertext()).split())
+            if key and value and key not in self.translations:
                 self.translations[key] = value
 
     def get_translation(self, name: str | None) -> str | None:
@@ -118,6 +120,15 @@ class NormalizationContext:
             class_id = elem.get("id")
             if class_id:
                 self.classes_by_id[class_id] = elem
+
+    def _index_display_name_types(self):
+        for type_elem in self.root.findall(".//Reference/Type"):
+            type_name = type_elem.get("name")
+            if (
+                type_name
+                and type_elem.find("Property[@name='DisplayName']") is not None
+            ):
+                self.types_with_display_name.add(type_name)
 
     def generate_hash(self, full_name: str) -> str:
         """

@@ -1,0 +1,25 @@
+<Project>
+  <Reference name="Example">
+    <Type name="Example.Displayable">
+      <Property name="DisplayName" />
+    </Type>
+    <Type name="Example.NamedOnly">
+      <Property name="Description" />
+    </Type>
+  </Reference>
+  <ClassDefinitions>
+    <ClassDefinition id="base" name="BaseClass" type="Example.Displayable">
+      <PropertyDefinition name="Pressure" />
+    </ClassDefinition>
+  </ClassDefinitions>
+  <Item id="translated" name="Pump" type="Example.Displayable">
+    <Property name="Input">Plant.Sensor</Property>
+  </Item>
+  <Item id="preexisting" name="Valve" type="Example.Displayable">
+    <Property name="DisplayName">Source Display</Property>
+  </Item>
+  <Item id="unsupported" name="Folder" type="Example.NamedOnly" />
+  <Item id="same" name="Identical" type="Example.Displayable" />
+  <Item id="empty" name="EmptyValue" type="Example.Displayable" />
+  <Item id="fallback" name="Unlisted" type="Example.Displayable" />
+</Project>

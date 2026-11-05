@@ -111,6 +111,16 @@ project = normalize(root, authstore_doc=authstore)
 The `/project` and `/security` API endpoints also accept an optional
 `authstore_path` query parameter.
 
+To load an optional language file for item/class translations and supported
+`DisplayName` properties:
+
+```python
+language = parse("en.words.html").getroot()
+project = normalize(root, language_doc=language)
+```
+
+The `/project` endpoint accepts the same file through `language_path`.
+
 ## Running Tests
 
 ```

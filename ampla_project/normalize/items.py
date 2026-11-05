@@ -69,6 +69,18 @@ def build_item(ctx: NormalizationContext, elem: Element) -> Item:
         if prop:
             item.properties[prop.name] = prop
 
+    if (
+        item.translation
+        and item.type in ctx.types_with_display_name
+        and "DisplayName" not in item.properties
+    ):
+        item.properties["DisplayName"] = Property(
+            name="DisplayName",
+            value=item.translation,
+            attributes={},
+            item_links=[],
+        )
+
     _add_source_defaults(item)
     _add_decision_matrix_data(ctx, elem, item)
 

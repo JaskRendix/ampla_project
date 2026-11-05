@@ -15,6 +15,9 @@ def get_security(
     authstore_path: str | None = Query(
         None, description="Optional path to the Ampla authorization store XML"
     ),
+    language_path: str | None = Query(
+        None, description="Optional path to the language translation HTML"
+    ),
 ) -> dict[str, object]:
-    project = load_project(path, authstore_path)
+    project = load_project(path, authstore_path, language_path)
     return project_to_json(project)["security"]

@@ -65,6 +65,50 @@ def test_normalize_loads_translations_from_language_document():
     assert project.items["I1"].translation == "Bonjour"
 
 
+def test_translation_injection_matches_source_and_preserves_fallbacks():
+    root = load_xml(Path("tests/data/parity/translations_project.xml"))
+    language = load_xml(Path("tests/data/parity/language_fr.html"))
+
+    project = normalize(root, language)
+
+    assert project.items["translated"].translation == "Pompe centrifuge"
+    assert project.items["translated"].properties["DisplayName"].value == (
+        "Pompe centrifuge"
+    )
+    assert project.items["preexisting"].translation == "Vanne"
+    assert project.items["preexisting"].properties["DisplayName"].value == (
+        "Source Display"
+    )
+    assert project.items["unsupported"].translation == "Dossier"
+    assert "DisplayName" not in project.items["unsupported"].properties
+    assert project.items["same"].translation is None
+    assert project.items["empty"].translation is None
+    assert project.items["fallback"].translation is None
+    assert project.classes["base"].translation == "Classe de base"
+    assert "DisplayName" not in project.classes["base"].properties
+    assert project.items["translated"].properties["Input"].value == "Plant.Sensor"
+
+
+def test_translation_serialization_is_additive_and_language_specific():
+    root = load_xml(Path("tests/data/parity/translations_project.xml"))
+    french = normalize(root, load_xml(Path("tests/data/parity/language_fr.html")))
+    english = normalize(root, load_xml(Path("tests/data/parity/language_en.html")))
+    french_data = project_to_json(french)
+    english_data = project_to_json(english)
+
+    assert french_data["items"]["translated"]["translation"] == "Pompe centrifuge"
+    assert french_data["items"]["translated"]["properties"]["DisplayName"] == {
+        "name": "DisplayName",
+        "value": "Pompe centrifuge",
+        "attributes": {},
+        "item_links": [],
+        "extra_xml": None,
+    }
+    assert english_data["items"]["translated"]["translation"] is None
+    assert "DisplayName" not in english_data["items"]["translated"]["properties"]
+    assert french_data["classes"]["base"]["translation"] == "Classe de base"
+
+
 def test_normalize_extracts_project_attributes_and_versions():
     xml = """
     <Project id="p" name="Project">

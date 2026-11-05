@@ -207,3 +207,20 @@ def test_project_and_security_api_merge_authstore_data():
     security_response = client.get("/security", params=params)
     assert security_response.status_code == 200
     assert security_response.json() == project_security
+
+
+def test_project_api_accepts_optional_translation_language():
+    project_path = str(Path("tests/data/parity/translations_project.xml").resolve())
+    language_path = str(Path("tests/data/parity/language_fr.html").resolve())
+
+    response = client.get(
+        "/project", params={"path": project_path, "language_path": language_path}
+    )
+
+    assert response.status_code == 200
+    data = response.json()
+    assert data["items"]["translated"]["translation"] == "Pompe centrifuge"
+    assert data["items"]["translated"]["properties"]["DisplayName"]["value"] == (
+        "Pompe centrifuge"
+    )
+    assert data["classes"]["base"]["translation"] == "Classe de base"

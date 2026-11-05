@@ -269,10 +269,11 @@ The Python package implements the core normalization pipeline, but `src` contain
 - Excel-specific workbook rendering and module exports.
 - Browser/document UI rendering and HTML scaffolding.
 - Export helpers for OleDb, RDF, and translated output documents.
-- Project translation transform templates.
+- `Project.Translations.xslt` HTML translation upload output.
 
 ### Missing Python coverage relative to old XSLT architecture
-- AuthStore normalization is integrated into `ampla_project.normalize.security`; project translation transforms remain unimplemented.
+- AuthStore normalization is integrated into `ampla_project.normalize.security`.
+- `Translate.Project.xslt` translation injection is integrated into the normalization context and item normalization. `Project.Translations.xslt` remains out of scope because it generates HTML.
 - The Python package does not implement any of the report-generation and export templates present under `src/StyleSheets/Document.*` and `src/StyleSheets/Excel.*`.
 - Graph rendering and DotML generation are absent in Python; these are still only in XSLT (`BuildToDotML.xslt`, `Common.Graphs.DotML.xslt`, etc.).
 - The legacy `Project.OLEDB.xslt`, `Project.RDF.xslt`, and `Document.OleDb.xslt` exports are not represented in `ampla_project`.
@@ -285,8 +286,8 @@ The Python package implements the core normalization pipeline, but `src` contain
 |---|---|---|
 | `src/StyleSheets/Project.Normalize.xslt` | normalization | `ampla_project.normalize.normalize` |
 | `src/StyleSheets/Authstore.Normalize.xslt` | normalization | `ampla_project.normalize.security` (optional AuthStore input) |
-| `src/StyleSheets/Project.Translations.xslt` | normalization / translation | not implemented |
-| `src/StyleSheets/Translate.Project.xslt` | normalization / translation | not implemented |
+| `src/StyleSheets/Project.Translations.xslt` | HTML translation output | out of scope |
+| `src/StyleSheets/Translate.Project.xslt` | DisplayName translation injection | `ampla_project.normalize.context`, `ampla_project.normalize.items` |
 | `src/StyleSheets/File.ItemId.Fullname.Type.xslt` | normalization helper | not implemented |
 
 ### Items, properties, and inventory

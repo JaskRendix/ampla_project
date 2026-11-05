@@ -11,6 +11,8 @@ All **HTML, Excel, DotML, mindmap, and reporting templates** are explicitly **ou
 | Legacy XSLT | Purpose | Python Equivalent |
 |------------|----------|-------------------|
 | `Project.Normalize.xslt` | Main normalization pipeline | `normalize.items`, `normalize.properties`, `normalize.classes`, `normalize.links` |
+| `Translate.Project.xslt` | Inject translated DisplayName for supported item types | `normalize.context`, `normalize.items` |
+| `Project.Translations.xslt` | HTML translation upload page | Out of scope (presentation output) |
 | `Document.Common.xslt` | Shared normalization helpers | `normalize.context` |
 | `Document.Properties.xslt` | Property extraction | `normalize.properties` |
 | `Document.ItemTypes.xslt` | Item type resolution | `normalize.items` |
@@ -107,7 +109,11 @@ They are intentionally excluded from the Python migration.
 - Context  
 
 ### Partially replaced  
-- Translations (basic support only)
+- Translation HTML/upload output from `Project.Translations.xslt` (intentionally out of scope)
+
+`Translate.Project.xslt` model behavior is implemented: translation lookup, item/class
+translation metadata, and translated `DisplayName` generation for item types that
+declare that property.
 
 ### Not replaced (intentionally)
 - HTML reports  

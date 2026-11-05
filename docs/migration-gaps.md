@@ -20,13 +20,12 @@ Legacy **reporting, HTML, Excel, DotML, and mindmap** templates are explicitly *
 - Flow graph creation → `ampla_project.normalize.flow`
 - Security extraction → `ampla_project.normalize.security`
 - Context, translations, version extraction → `ampla_project.normalize.context`
+- Translation injection and supported `DisplayName` generation → `ampla_project.normalize.items`
 
 ## ❗ Missing (Normalization Only)
-- `Project.Translations.xslt` / `Translate.Project.xslt` — translation injection not implemented
 - `File.ItemId.Fullname.Type.xslt` — helper for ID/fullname/type mapping not implemented
 
 ## Priority
-- **High**: Translation injection (if full parity with legacy normalization is required)
 - **Medium**: Helper templates (only needed for legacy‑compatible output)
 
 ---
